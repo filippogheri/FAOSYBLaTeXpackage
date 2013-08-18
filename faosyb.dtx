@@ -47,7 +47,7 @@
 %\iffalse
 %    \begin{macrocode}
 \documentclass{ltxdoc}
-\usepackage{array}
+\usepackage{array,graphpap}
 \usepackage{hypdoc}
 \PageIndex
 \CodelineIndex
@@ -62,7 +62,7 @@
 % \MakeShortVerb{|}
 % \GetFileInfo{faosyb.dtx}
 % \newcommand{\progname}[1]{\textsf{#1}}
-% \title{\LaTeX{} Style for FAO Yearbook
+% \title{New \LaTeX{} Style for FAO Yearbook
 %   \thanks{\copyright 2013, Food and Agriculture Organization of the
 %   United Nations}} 
 % \author{Boris Veytsman\thanks{%
@@ -74,6 +74,563 @@
 %   This package provides class for typesetting FAO Yearbook.  This is
 %   a refactoring of the \progname{faoyeabook} package
 % \end{abstract}
+%
+%
+%\section{Introduction}
+%\label{sec:intro}
+%
+% The package \progname{faoyearbook}~\cite{faoyearbook11} was written
+% in 2011 for FAO Statistical Yearbook.
+%
+% The package \progname{faosyb} is a refactoring of this package.  We
+% use the lessons learned and incorporate new design requirements.  We
+% use some (actually plenty) code from the previous version, but since
+% we do not have to be compatibility, we can correct some unfortunate
+% decisions.  
+%
+%\section{User Guide}
+%\label{sec:user_guide}
+%
+% The installation of the class follows the usual
+% practice~\cite{TeXFAQ} for \LaTeX{} packages:
+% \begin{enumerate}
+% \item Run \progname{latex} on |faosyb.ins|.  This will produce the
+% \LaTeX{} class |faosyb.cls|.
+% \item Put the file |faosyb.cls| to the place where \LaTeX{} can
+%   find it (see \cite{TeXFAQ} or the documentation for your \TeX{}
+%   system).\label{item:install}
+% \item Update the database of file names.  Again, see \cite{TeXFAQ}
+% or the documentation for your \TeX{} system for the system-specific
+% details.\label{item:update}
+% \item The file |faosyb.pdf| provides the documentation for the
+% package (this is the file you are probably reading now).
+% \end{enumerate}
+% As an alternative to items~\ref{item:install} and~\ref{item:update}
+% you can just put the file |faosyb.cls| in the working directory
+% where your |.tex| file is.
+%
+%\subsection{Invocation}
+%\label{sec:ug_invocation}
+%
+% To use the class, put in the preamble of your document
+% \begin{flushleft}
+% |\documentclass[|\meta{options}|]{faosyb}|
+% \end{flushleft}
+%
+% If the option |web| (default) is chosen, the pages of the book have
+% the dimensions corresponding to A4 paper.  However, if the option
+% |print| is chosen, then the pages are printed on a wider area, and
+% crop marks are added for the trimming.
+%
+% If the option |issuu| is chosen, the internal links are transformed
+% to external in the form suitable for \url{http://www.issuu.com}.
+% Note that this option probably does not make much sense unless |web|
+% option is also chosen.  However, it is still possible to select both
+% |print| and |issuu| option if someone needs it for an obscure
+% purpose.  
+%
+% Some regional books are printed on A4 paper with slightly different
+% margins.  These options select alternative margins---either normal
+% or narrow.  Note that these options automatically select |print|
+% setup, and should not be combined with the |print| option.
+%
+%
+% The option |Draft| (note the capitalization!) leads to the the large
+% word `DRAFT' printed across the pages.  The standard \LaTeX{} option
+% |draft| leads to the same result, but it also makes other changes,
+% most notably, in the behavior of the |\includegraphics| command and
+% warnings.  
+%
+% \DescribeMacro{\ifprint}
+% It is possible to query the current mode using the macro
+% \cmd{\ifprint}, for example
+% \begin{verbatim}
+% \ifprint
+%   Stuff for print version
+% \else
+%   Stuff for web version
+% \fi
+% \end{verbatim}
+% Any branch of this conditional may be empty, so web-only stuff can
+% be coded as
+% \begin{verbatim}
+% \ifprint\else Web-only stuff\fi
+% \end{verbatim}
+% 
+%
+% \DescribeMacro{\includegraphics}
+% There is a special facilty for \cmd{\includegraphics} command to
+% choose a file depending on the current mode of the package.  Namely,
+% if there is a file |image_print.pdf| visible by \LaTeX, then the commands
+% |\includegraphics{image}| or  |\includegraphics{image.pdf}| selects
+% the file |image_print.pdf|.  In the case this file is not found, the
+% file |image.pdf| is selected instead.  Similarly in the web mode the
+% file |image_web.pdf| will be selected first, and only if it does not
+% exist, |image.pdf| is selected.  This rule works also for commands
+% \cmd{\includeLargeGraphics} and \cmd{\includeExtraLargeGraphics}
+% described below.
+%
+% Note that at this time there is no
+% similar facility for the |\input| command.  
+%
+%\subsection{Setting Parameters}
+%\label{sec:ug_faoset}
+%
+% \DescribeMacro{\faoset}
+% Some parameters in the class can be set with the command
+% |\faoset|\marg{key=value}, for example
+% \begin{verbatim}
+% \faoset{bgcolor=blue}
+% \end{verbatim}
+% 
+%
+%  Most of the parameters are explained below.
+%
+%\subsection{Fonts}
+%\label{sec:ug_fonts}
+%
+%\DescribeMacro{\narrowfamily}
+%\DescribeMacro{\textnarrow}
+%\DescribeMacro{\captionfamily}
+%\DescribeMacro{\textcaption}
+% The class uses PT Sans fonts~\cite{Farar:ParaType} for body text and
+% Arev fonts~\cite{Hartke:ArevSans} for math.  It defines two
+% additional families: Narrow and Caption, corresponding to the PT
+% Sans Narrow and PT Sans Caption font.  They can be selected by the
+% declarations \cmd{\narrowfamily} and \cmd{\captionfamily} or by the
+% commands \cmd{\textnarrow}\marg{text} and
+% \cmd{\textcaption}\marg{text} following the usual \LaTeX{}
+% conventions.  Note that since PT Sans does not provide math
+% alphabet, this choice does not change the mathematical text.
+%
+% PT Sans Narrow may be useful for typesetting tables, for example,
+% \begin{verbatim}
+%  {\scriptsize\narrowfamily
+%  \rowcolors{4}{@bgcolor!30}{@bgcolor!20}
+%  \input{./Tables/P1.DEM_1.tex}}
+% \end{verbatim}
+%  
+%
+%\subsection{Colors and Icons for Parts}
+%\label{sec:ug_color_icons}
+%
+% A Yearbook is separated into parts (more on this below).  Each part
+% has its own color and icon.  They are set by the keys |bgcolor| and
+% |icon| of the \cs{faoset} command, for example,
+% \begin{verbatim}
+% \faoset{icon=./Icons/agriculture.png}
+% \faoset{icon=./Icons/population}
+% \faoset{bgcolor=blue}
+% \faoset{bgcolor=green!25!yellow}
+% \end{verbatim}
+% The parameter for the |icon| key can be any file name (with or
+% without extension), suitable for the \cs{includegraphics} command.
+% The parameter for the |bgcolor| key can be specified in any form
+% acceptable by \progname{xcolor} package~\cite{Kern07:Xcolor}.  
+%
+% The key |tableheadcolor| sets the color for the headers of tables defined
+% by |H| or |P| key (see Section~\ref{sec:ug_floats}).  Normally it is
+% 30\% of the current |@bgcolor| color, but it can be set to any required
+% value. 
+%
+% \DescribeMacro{\selecticon}\DescribeMacro{\selectcolor}
+% Note that \cs{faoset} command does not change the icon or background
+% color immediately.  When issued \emph{before} \cs{part} command, it
+% sets up icon and color for the next part.  If needed, you can
+% manually change this using \cs{selecticon} and \cs{selectcolor}
+% commands.  In most cases you should \emph{not} use these commands.  
+%
+% \DescribeMacro{@bgcolor}
+% \DescribeMacro{@tableheadcolor}
+% \DescribeMacro{\currenticon}
+% After a \cs{part} command (or explicit \cs{selecticon} and
+% \cs{selectcolor} command we can access the current values of the
+% color in |@bgcolor|, |@tablecolor| colors and \cs{currenticon}
+% macro.  
+%
+%\subsection{Sectioning}
+%\label{sec:ug_sections}
+%
+% \DescribeMacro{\part} 
+% \DescribeMacro{\section} 
+% \DescribeMacro{\subsection} 
+%  The main division of the text are |\part|s.
+%  The command \cmd{\part}\marg{title} is used for numbered parts, while the
+%  command \cmd{\part*}\marg{title} is used for unnumbered parts.  The
+%  next division are |\section|s and 
+% |\subsection|s.  They are never numbered.  The style does not use
+% |\chapter|s. 
+%
+% \DescribeMacro{\EndPartIntro}
+% The sections immediately following new parts are special:  they are
+% typeset in one column and cannot have floats.  The command
+% |\EndPartIntro| switches to the ``normal'' sections.  
+%
+%
+%
+%\subsection{Floats}
+%\label{sec:ug_floats}
+%
+% One of the most important changes from the previous version of the
+% class~\cite{faoyearbook11} is the treatment of floats.
+%
+% In standard \LaTeX\ floats ``float'': they can be placed by the
+% algorithm anywhere.  The previous version made them ``sticky'':  the
+% author explicitly tells \TeX\ where floats should be placed.
+% However, to do so the class required the author to make explicity
+% page breaks, which was not very convenient.
+%
+% This version has a completely rewritten interface and algorithm for
+% placing floats:
+% \begin{enumerate}
+% \item Like in standard \LaTeX, authors do not normally provide page
+% breaks---\TeX\ tries to make this decision for them.
+% \item Like in the previous version, floats are put exactly where the
+% authors want them---no default placing and second-guessing.
+% \end{enumerate}
+% 
+% Here is how it is done.  
+%
+% The main unit of the book is \emph{spread:} a verso page and the
+% corresponding recto page.  Each page is divided into four quarters,
+% upper left, upper right, lower left and lower right.  We will denote
+% them \texttt{ul}, \texttt{ur}, \texttt{ll}, \texttt{lr} for the
+% verso page and \texttt{UL}, \texttt{UR}, \texttt{LL}, \texttt{LR}
+% for the recto page (Figure~\ref{fig:spread}).  We allow four kinds
+% of floats:
+% \begin{description}
+% \item[Single floats] occupy exactly one quarter.  They are denoted as
+% \texttt{S}.
+% \item[Tall floats] occupy two quarters stacked vertically
+% (for example, \texttt{ul} and \texttt{ll}).  They are denoted as
+% \texttt{T}.
+% \item[Wide floats] occupy two quarters adjacent horizontally (for
+% example, \texttt{LL} and \texttt{LR}).  They are denoted as
+% \texttt{W}.
+% \item[Big floats] occupy all four quarters on a page.  They are
+% denoted as \texttt{B}.  
+% \end{description}
+% 
+%
+%
+% \begin{figure}
+%   \centering
+%   \begin{picture}(350,250)
+%     \put(0,150){\framebox(75,100){ul}}
+%     \put(75,150){\framebox(75,100){ur}}
+%     \put(0,50){\framebox(75,100){ll}}
+%     \put(75,50){\framebox(75,100){lr}}
+%     \put(50,25){Verso page}
+%     \put(200,150){\framebox(75,100){UL}}
+%     \put(275,150){\framebox(75,100){UR}}
+%     \put(200,50){\framebox(75,100){LL}}
+%     \put(275,50){\framebox(75,100){LR}}
+%     \put(250,25){Recto page}
+%   \end{picture}
+%   \caption{A Spread}
+%   \label{fig:spread}
+% \end{figure}
+% 
+% The parameters \marg{type} and \marg{location} are mandatory for
+% floats, for example
+% \begin{verbatim}
+% \begin{map}{T}{ur}
+%   ...
+% \end{map}
+% \begin{chart}{S}{UL}
+%   ...
+% \end{chart}
+% \end{verbatim}
+% For multiquarter floats the location is the location of the upper
+% left corner, so Big float can use only |ul| or |UL| location.
+%
+% Of course, not all combinations are valid:  you cannot specify float
+% as |{T}{ll}| or |{W}{UR}|, for example.  If you use such
+% combinations, the results may be unpredictable.  Also it is not
+% predictable what happens if you try to put overlapping floats
+% (e.g. |{S}{UR}| and |{W}{UL}|).  
+%
+% There are two additional rules:
+% \begin{enumerate}
+% \item A verso page may have text and floats (still it is
+% recommended that if it has text, then it should not have floats
+% occupying the upper left corner).
+% \item A recto page may have \emph{either} text \texttt{or} floats:
+% if there are floats for this page, all text is moved to the
+% following verso page.  
+% \end{enumerate}
+%  
+% There are three
+% types of floats defined by the class:
+% \DescribeEnv{table}
+% \DescribeEnv{chart}
+% \DescribeEnv{map}
+% \DescribeEnv{minitab}
+% \begin{description}
+% \item[table] tabular material,
+% \item[chart] plots and other charts,
+% \item[map] mapped data.
+% \item[minitab] mini tables.
+% \end{description}
+% \DescribeMacro{caption}
+% Each of these kinds of material is typeset using the corresponding
+% environment: |table|, |chart|, |minitab| or |map|.  Note that the caption for
+% each of these environments \emph{must} precede the graphical
+% material, for example:
+% \begin{verbatim}
+% \begin{chart}{B}{UL}
+%   \caption{Hunger Data}
+%   \label{chart:hunger}
+%   \includegraphics{hunger.pdf}
+% \end{chart}
+% \end{verbatim}
+%
+% \DescribeMacro{\listoftables}
+% \DescribeMacro{\listofcharts}
+% \DescribeMacro{\listofmaps}
+% The standard \LaTeX{} has the command |\listoftables| to produce the
+% list of tables in the document.  Our class retains this command and
+% produces two additional commands |\listofcharts| and |\listofmaps|
+% with the obvious meaning.
+%
+%
+%
+%\subsection{Page Breaks}
+%\label{sec:ug_page_breaks}
+%
+% \DescribeMacro{\clearpage}
+% \DescribeMacro{\cleardoublepage}
+% \DescribeMacro{\clearspread}
+% Standard \LaTeX\ has commands for immediate page break
+% (e.g. \cs{clearpage}) and for switching to the next recto page,
+% possibly ejecting the next verso page (\cs{cleardoublepage}).  The
+% class provides another command \cs{clearspread}.  It  switches to
+% the next \emph{verso} page, possibly ejecting the next recto page
+% (and putting there floats intended for this page, if any).  
+%
+%
+%\subsection{Tables}
+%\label{sec:ug_tables}
+%
+% To typeset numericall items one should use |d| column identifier
+% with the format |d|\marg{a.b}, where $a$ is the number of decimal
+% in the integer part of the number, and $b$ is the number of decimal
+% digitst in the fractional part.  For example, a number $12.345$
+% corresponds to |d{2.3}|.  The column headers are usually \emph{not}
+% numerical, so one need to use \cmd{\multicolumn} entries to typeset
+% them.  The class defines several such entries:
+% \begin{description}
+% \item[H] produces a centered entry.
+% \item[P] produces an entry of a given length, for example,
+% |P{1.5cm}|
+%
+% \item[C] produces an entry of the length corresponding to 
+% the given number of numerical columns.  For example, |C{2}|
+% corresponds to a header of two numerical columns.  Each column is
+% assumed to be of the size enough to store $-99.999$.  
+% \end{description}
+% 
+%
+% \DescribeMacro{\hhline}
+% For the rules that do not span the table width
+% \cmd{\hhline}\marg{specificaiton} command from the \progname{hhline}
+% package should be used.  The \marg{specification} argument of this
+% command has many variants, but for our purposes we need only one
+% variant: the command |-| produces a horizontal line spanning one
+% column.  The color of this line is determined by the command
+% \cmd{\arrayrulecolor}\marg{color}, issued in the last |>|\marg{argument}
+% command before the |-| specification.  Therefore the command
+% |>{\arrayrulecolor{@tableheadcolor}}-| produces a line of the color
+% |@tableheadcolor|, which is seen as the absence of line.  The
+% command |>{\arrayrulecolor{black}}---| produces a black line
+% spanning three columns. Thus if we have a four-column table and want
+% a rule spanning columns 2--3, the following command should be issued:
+% \begin{verbatim}
+%   \hhline{>{\arrayrulecolor{@tableheadcolor}}-% Column 1, no rule
+%     >{\arrayrulecolor{black}}--%  Columns 2 and 3, black rule
+%     >{\arrayrulecolor{@tableheadcolor}}-}% Column 4, no rule
+% \end{verbatim}
+% The usual |*| specification may be used for repeating patterns, for
+% example, |*{5}{-}| is equivalent to |-----|.  
+%
+% The vertical bar \verb+|+ specification in the \cmd{\hhline}
+% argument means an interruption of the line. The interruption is by
+% defalut a black interval, to make it the same color as the header
+% background, use \verb+>{\arrayrulecolor{@tableheadcolor}}|+. 
+%
+%\subsection{Publication Descriptions}
+%\label{sec:ug_publications}
+%
+% \DescribeEnv{publication} FAO yearboook describes some FAO
+% publications.  These publications should be put inside the
+% environment |publication|.  The environment has one mandatory
+% argument, which is the title of the publication, and one optional
+% argument, which sets the file name of the publication cover. Note
+% that the option argument, if present, must precede the mandatory
+% one. If this
+% argument is absent, no cover is included.
+% \DescribeMacro{\pDescription} 
+% \DescribeMacro{\pEdition} \DescribeMacro{\pCycle} 
+% \DescribeMacro{pWeb}
+% Inside the
+% environment the macros \cmd{\pDescription}\marg{description},
+% \cmd{\pEdition}\marg{year}\marg{edition}, \cmd{\pWeb}\marg{URL}
+% and \cmd{\pCycle}\marg{date} are used to typeset the corresponding
+% items related to the publication.  For example,
+% \begin{verbatim}
+% \begin{publication}[./Plots/StateOfFoodAndAgriculture.png]{The State
+%     of Food and Agriculture}
+%   \pDescription{The State of Food and Agriculture, FAO's major
+%     annual flagship publication, aims at bringing to a wider
+%     audience balanced science-based assessments of important issues
+%     in the field of food and agriculture.  Each edition of the
+%     report contains a comprehensive, yet easily accessible, overview
+%     of a selected topic of major relevance for rural and
+%     agricultural development and for global food security.  This is
+%     supplemented by a synthetic overview of the current global
+%     agricultural situation.}
+%  \pEdition{2010}{Livestock in the balance}
+%  \pEdition{2011}{Women in Agriculture Closing the gender gap for
+%    development} 
+%  \pCycle{May each year}
+%  \pWeb{http://www.fao.org/docrep/013/i2050e/i2050e00.htm}
+% \end{publication}
+% \end{verbatim}
+% Note that, as in the example, some fields may be repeated.  
+%
+% Two spacing parameters can be used for typesetting of publications:
+% |publicationskip| is the amount of additional space between the publications,
+% while |publicationparskip| is the space between the paragraphs
+% inside the publication environment.  The default values correspond
+% to the command
+% \begin{verbatim}
+% \faoset{publicationskip=6pt plus 2pt minus 2pt,
+%         publicationparskip=6pt plus 6pt minus 4pt}
+% \end{verbatim}
+% 
+% 
+%
+%\subsection{Metadata}
+%\label{sec:ug_metadata}
+%
+% \DescribeEnv{MetadataCollection}
+% \DescribeEnv{metadata}
+% Each chart, map of table in the book has a \emph{source}.  Soruces
+% are collected in the environemnt |MetadataCollection|, which consists
+% of separate
+% |metadata| environments.  Each |metadata| environment  has two obligatory
+% arguments---the name of the source and the key.  The key is used to
+% identify the metadata in the charts, maps, tables and other
+% objects.  The environment may include other commands.
+% \begin{description}
+% \item[\cmd{\source}\marg{source}]\DescribeMacro{\source} sets the
+% source of the data.
+% \item[\cmd{\owner}\marg{owner}]\DescribeMacro{\owner} sets the owner
+% of the data.
+% \end{description}
+% Note that there is no ``description'' command because any text which
+% is not an argument of the commands above is considered to belong to
+% the description of the data.
+%
+% Example of the usage of these commands:
+% \begin{verbatim}
+% \begin{MetadataCollection}
+% \begin{metadata}{Agricultural population}{P1.DEM.FAO.POP.AGR} 
+% 
+%    Agricultural population is defined as all persons depending for
+%    their livelihood on agriculture, hunting, fishing and forestry.
+%    It comprises all persons economically active in agriculture as
+%    well as their non-working dependents. It is not necessary that
+%    this referred population exclusively come from rural population.
+%
+%    \source{FILL ME}
+%    \owner{FILL ME}
+% \end{metadata}
+% \end{MetadataCollection}
+% \end{verbatim}
+%
+% \DescribeMacro{\refMetadata}
+% The metadata is referenced by the command
+% \cmd{\refMetdata}\marg{key}, for example
+% \begin{verbatim}
+% \refMetadata{P1.DEM.FAO.POP.AGR}
+% \end{verbatim}
+% This command will be typset as
+% \begin{quote}
+%   Source: Agricultural population, page NNNN.
+% \end{quote}
+% This command must \emph{not} occur in the caption of the chart, map
+% or table.
+%
+%
+% Note that the package automatically provides backreferencing: all
+% charts, maps and tables where the medatada is referenced, are
+% mentioned in the corresponding metadata section.
+%
+% The sources of each chart, map or table can be shown in the lists of
+% charts, tables, maps or not.  The key |metadataInLists| (by default
+% |false|) determines whether they are shown there.  To make them
+% visible, put before the lists
+% \begin{verbatim}
+% \faosetup{metadataInLists=true}
+% \end{verbatim}
+% 
+%
+%
+%
+%\subsection{Concepts and Methods}
+%\label{sec:ug_concepts}
+% 
+% \DescribeEnv{ConceptsAndMethods}
+% The environment |ConceptsAndMethods| starts a new section ``Concepts
+% and Methods''.
+% Concepts and methods are collected in the series of |concept|
+% environments. Each environment has one obligatory field: the name of
+% the concept, for example:
+% \begin{verbatim}
+% \begin{ConceptsAndMethods}
+%   \begin{concept}{Gross domestic product}
+%     Gross domestic product (GDP) is the market value of all officially
+%     recognized final goods and services produced within a country in a
+%     given period of time. 
+%   \end{concept}
+%   \begin{concept}{Gross state product}
+%     Gross state product (GSP), or gross regional product (GRP), is a
+%     measurement of the economic output of a state or province (i.e.,
+%     of a subnational entity). It is the sum of all value added by
+%     industries within the state and serves as a counterpart to the
+%     gross domestic product (GDP). 
+%   \end{concept}
+% \end{ConceptsAndMethods}
+% \end{verbatim}
+% 
+% 
+%
+%\subsection{Further Reading}
+%\label{sec:ug_further_reading}
+% 
+% \DescribeEnv{freading}
+% The special environment |freading| is used for the ``further
+% reading'' sections of the book.  It starts the text from the new
+% page and changes some defaults.  
+%
+%
+%\subsection{Subscripts in Text}
+%\label{sec:ug_textsubscript}
+%
+% \DescribeMacro{\textsubscript}
+% The standard \LaTeX{} defines \cmd{\textsuperscript}.  The class
+% adds a similar \cmd{\textsubscript} command.
+%
+% 
+%
+%
+%\StopEventually{%
+% \clearpage
+% \bibliography{faosyb}
+% \bibliographystyle{unsrt}}
+% \clearpage
+%
 %\Finale
 %\clearpage
 %
