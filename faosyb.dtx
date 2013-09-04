@@ -37,7 +37,7 @@
 \ProvidesFile{faosyb.dtx}
 %</gobble>
 %<class>\ProvidesClass{faosyb}
-[2013/08/11 v0.1 Typesetting FAO Yearbook]
+[2013/08/18 v0.1 Typesetting FAO Yearbook]
 %<*gobble>
 %    \end{macrocode}
 %
@@ -129,10 +129,6 @@
 % |print| and |issuu| option if someone needs it for an obscure
 % purpose.  
 %
-% Some regional books are printed on A4 paper with slightly different
-% margins.  These options select alternative margins---either normal
-% or narrow.  Note that these options automatically select |print|
-% setup, and should not be combined with the |print| option.
 %
 %
 % The option |Draft| (note the capitalization!) leads to the the large
@@ -630,6 +626,346 @@
 % \bibliography{faosyb}
 % \bibliographystyle{unsrt}}
 % \clearpage
+%
+%\subsection{Options}
+%\label{sec:options}
+% 
+% \begin{macro}{\faoyearbook@size@warning}
+% The font-changing options are not used in our setup, so we just
+% produce a warning:
+%    \begin{macrocode}
+\long\def\faoyearbook@size@warning#1{%
+  \ClassWarning{faoyearbook}{Size-changing option #1 will not be
+    honored}}%
+\DeclareOption{8pt}{\faoyearbook@size@warning{\CurrentOption}}%
+\DeclareOption{9pt}{\faoyearbook@size@warning{\CurrentOption}}%
+\DeclareOption{10pt}{\faoyearbook@size@warning{\CurrentOption}}%
+\DeclareOption{11pt}{\faoyearbook@size@warning{\CurrentOption}}%
+\DeclareOption{12pt}{\faoyearbook@size@warning{\CurrentOption}}%      
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifprint}
+%   We have a flag shich shows whether we are in Web or print mode
+%    \begin{macrocode}
+\newif\ifprint
+\printfalse
+\DeclareOption{web}{\printfalse}
+\DeclareOption{print}{\printtrue
+  \PassOptionsToPackage{papersize={230mm,317mm},layout=a4paper,
+    layouthoffset=1cm,layoutvoffset=1cm,twoside}{geometry}}
+%    \end{macrocode}   
+% \end{macro}
+%
+% \begin{macro}{\ifDraft}
+%   If we are in `Draft' or `draft mode', we print a word `draft'
+%   across the page:
+%    \begin{macrocode}
+\newif\ifDraft
+\Draftfalse
+\DeclareOption{Draft}{\Drafttrue}
+\DeclareOption{draft}{\Drafttrue}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\if@issuumode}
+%   Whether we need issuu-style links
+%    \begin{macrocode}
+\newif\if@issuumode
+\@issuumodefalse
+\DeclareOption{issuu}{\@issuumodetrue}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% All other options are just sent to the main class:
+%    \begin{macrocode}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
+\ProcessOptions\relax
+%    \end{macrocode}
+% 
+%\subsection{Loading Class and Packages}
+%\label{sec:loading}
+%
+% We start with the base class and some packages
+%    \begin{macrocode}
+\LoadClass[10pt,twoside,twocolumn]{report}
+\RequirePackage{graphicx,xkeyval}
+\RequirePackage[table,cmyk]{xcolor}
+\RequirePackage{tikz,geometry,dcolumn}
+\RequirePackage{fancyhdr}
+\RequirePackage{caption,lscape,longtable,siunitx,booktabs}
+\RequirePackage{multicol,atbegshi,picture,hhline,afterpage}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8x]{inputenc}
+\RequirePackage{pdfpages}
+\RequirePackage[authoryear]{natbib}
+\RequirePackage[breaklinks]{hyperref}
+\RequirePackage{bookmark}
+\if@issuumode
+\RequirePackage{issuulinks}
+\fi
+%    \end{macrocode}
+%
+% Options for the hyperef package are set as follows:
+%    \begin{macrocode}
+\ifprint
+\hypersetup{breaklinks,colorlinks=false,pdfborder=0 0 0,    
+  pdfauthor={FAO},
+  pdfsubject={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
+  pdftitle={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
+  pdfkeywords={FAO, Food Security, Undernourishment, Sustainable agriculture},
+  pdfpagelayout=TwoColumnLeft,
+  pdfnewwindow=true
+}
+\else
+\hypersetup{breaklinks,colorlinks=false,pdfborder=0 0 0,    
+  pdfauthor={FAO},
+  pdfsubject={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
+  pdftitle={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
+  pdfkeywords={FAO, Food Security, Undernourishment, Sustainable agriculture},
+  pdfpagelayout=TwoColumnRight,
+  pdfnewwindow=true
+}
+\fi
+%    \end{macrocode}
+%
+%\subsection{Color}
+%\label{sec:colors}
+%
+% We need to tell the printer that we are using CMYK color model.  The
+% following is taken from the |pdfx| package (the package itself is
+% not too easy to make work).
+%    \begin{macrocode}
+\def\@pctchar{\expandafter\@gobble\string\%}
+\def\@bchar{\expandafter\@gobble\string\\}
+\immediate\pdfobj stream attr{/N 4}  file{FOGRA39L.icc}
+\edef\OBJ@CVR{\the\pdflastobj}
+\pdfcatalog{/OutputIntents [ <<
+  /Type/OutputIntent
+  /S/GTS_PDFX
+  /OutputCondition (FOGRA39)
+  /OutputConditionIdentifier (FOGRA39 \@bchar(ISO Coated v2
+   300\@pctchar\space \@bchar(ECI\@bchar)\@bchar))
+  /DestOutputProfile \OBJ@CVR\space 0 R
+  /RegistryName(http://www.color.org)
+ >> ]}
+%    \end{macrocode}
+%
+%\subsection{Key-Value Interface}
+% \label{sec:keyval}
+%
+% \begin{macro}{\faoset}
+%   We define the family |fao| for our keys:
+%    \begin{macrocode}
+\def\faoset#1{\setkeys{fao}{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%\subsection{Fonts}
+%\label{sec:fonts}
+%
+% We use arev for mathematics:
+%    \begin{macrocode}
+\RequirePackage{arevmath}
+%    \end{macrocode}
+%
+% For body text we use PT~Sans:
+%    \begin{macrocode}
+\def\PTSans@scale{0.95}
+\def\PTSansNarrow@scale{0.95}
+\def\PTSansCaption@scale{0.95}
+\renewcommand{\sfdefault}{PTSans-TLF}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\bfdefault}{b}
+%    \end{macrocode}
+%
+% \begin{macro}{\narrowfamily}
+%   We declare a new family, \cs{narrowfamily}:
+%    \begin{macrocode}
+\DeclareRobustCommand\narrowfamily{\fontfamily{PTSansNarrow-TLF}\selectfont}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\textnarrow}
+%   And the matching \cs{textnarrow} command:
+%    \begin{macrocode}
+\DeclareTextFontCommand{\textnarrow}{\narrowfamily}
+%    \end{macrocode}   
+% \end{macro}
+%
+%
+% \begin{macro}{\captionfamily}
+%   Same with  \cs{captionfamily}:
+%    \begin{macrocode}
+\DeclareRobustCommand\captionfamily{\fontfamily{PTSansCaption-TLF}\selectfont}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\textcaption}
+%   And the matching \cs{textcaption} command:
+%    \begin{macrocode}
+\DeclareTextFontCommand{\textcaption}{\captionfamily}
+%    \end{macrocode}   
+% \end{macro}
+%
+%
+% \begin{macro}{\normalsize}
+%   The basic size is 9.6pt:
+%    \begin{macrocode}
+\renewcommand\normalsize{%
+   \@setfontsize\normalsize{9.6pt}{\@xiipt}%
+   \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+   \abovedisplayshortskip \z@ \@plus3\p@
+   \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+   \belowdisplayskip \abovedisplayskip
+   \let\@listi\@listI}
+\normalsize
+%    \end{macrocode}   
+% \end{macro}
+%
+%
+% \begin{macro}{\small}
+% This is the small size:
+%    \begin{macrocode}
+\renewcommand\small{%
+   \@setfontsize\small\@ixpt{10}%
+   \abovedisplayskip 8.5\p@ \@plus3\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus2\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% We use |rm| style of URL:
+%    \begin{macrocode}
+\urlstyle{sf}
+%    \end{macrocode}
+% 
+%\subsection{Margins and Paragraphing}
+%\label{sec:pars}
+%
+%  We use a4paper.  
+%    \begin{macrocode}
+\geometry{layout=a4paper,
+  left=2cm,right=2cm,bottom=2cm,top=2cm,twoside,
+  columnsep=30pt, twoside}%
+\savegeometry{standard}
+%    \end{macrocode}
+%
+% \begin{macro}{\parindent}
+% \begin{macro}{\parskip}
+%   We use not indented paragraphs with paragraph borders given by
+%   skips
+%    \begin{macrocode}
+\setlength\parindent\z@
+\setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \end{macro}
+%
+%
+%\subsection{Cropmarks}
+%\label{sec:cropmarks}
+%
+% There are several packages that provide crop marks.  Unfortunately
+% they do not work for us because they put crop marks at the
+% background.  Since we have colored pages, we want crop marks to be
+% on the foreground.
+%
+% In this section we re-implement cropmarks of the \progname{geometry}
+% package, putting the marks on the foreground.
+%
+% We postpone the code to the beginning of the document to get the
+% proper value of the switch
+%    \begin{macrocode}
+\AtBeginDocument{\ifprint
+  \AtBeginShipout{%
+    \AtBeginShipoutUpperLeftForeground{%
+      \color{black}%
+      \@tempdima=\Gm@layouthoffset
+      \@tempdimb=\Gm@layoutvoffset
+      \put(\@tempdima,-\@tempdimb+6\p@){\line(0,1){50}}%
+      \put(\@tempdima-6\p@,-\@tempdimb){\line(-1,0){50}}%
+      \advance\@tempdima by \Gm@layoutwidth
+      \put(\@tempdima,-\@tempdimb+6\p@){\line(0,1){50}}%
+      \put(\@tempdima+6\p@,-\@tempdimb){\line(1,0){50}}%
+      \advance\@tempdimb by \Gm@layoutheight
+      \put(\@tempdima,-\@tempdimb-6\p@){\line(0,-1){50}}%
+      \put(\@tempdima+6\p@,-\@tempdimb){\line(1,0){50}}%
+      \advance\@tempdima by -\Gm@layoutwidth
+      \put(\@tempdima-6\p@,-\@tempdimb){\line(-1,0){50}}%
+      \put(\@tempdima,-\@tempdimb-6\p@){\line(0,-1){50}}%
+    }}\fi}
+%    \end{macrocode}
+% 
+% In draft mode we put the word `DRAFT' across the page:
+%    \begin{macrocode}
+\AtBeginDocument{\ifDraft
+  \AtBeginShipout{%
+    \AtBeginShipoutUpperLeft{%
+      \color{black!25}%
+      \@tempdima=\Gm@layouthoffset
+      \@tempdimb=\Gm@layoutvoffset
+      \advance\@tempdima by 0.2\Gm@layoutwidth
+      \advance\@tempdimb by 0.7\Gm@layoutheight
+      \put(\@tempdima,-\@tempdimb){%
+        \rotatebox{45}{%
+          \fontsize{6cm}{6cm}\selectfont 
+          DRAFT}}}}\fi}
+%    \end{macrocode}
+% 
+% 
+%
+%\subsection{Nonfloats}
+%\label{sec:floats}
+%
+% In Faoyearbook we used float package.  Since we changed too much in
+% the internals, here we just reuse its code.
+%
+%   
+% \begin{macro}{\nonfloat@type}
+%   The counter to keep the next type to assign
+%    \begin{macrocode}
+\newcount\nonfloat@type
+\nonfloat@type=4\relax
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+% \begin{macro}{\newnonfloat}
+%   The macro \cs{newnonfloat} has the following arguments:  TYPE,
+%   EXT, NAME, LISTNAME, for example
+% \begin{verbatim}
+% \newnonfloat{map}{lom}{Map}{List of Maps}
+% \end{verbatim}
+%   It defines a nonfloat with these parameters.
+%    \begin{macrocode}
+\def\newnonfloat#1#2#3#4{%
+%    \end{macrocode}
+%   First, we need to define |\ftype@TYPE|: the type of the float.
+%   Note that tables are taken, so we need to make a special care of
+%   nonfloats that correspond to floats.
+%    \begin{macrocode}
+  \expandafter\ifx\csname ftype@#1\endcsname\relax
+    \expandafter\edef\csname ftype@#1\endcsname{\the\nonfloat@type}%
+    \multiply\nonfloat@type by 2\relax
+  \fi
+%    \end{macrocode}
+% Now we define the extension for the floats
+%    \begin{macrocode}
+}
+%    \end{macrocode}
+% 
+%   
+% \end{macro}
 %
 %\Finale
 %\clearpage

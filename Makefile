@@ -1,7 +1,7 @@
 
 PACKAGE=faosyb
 
-SAMPLES =					\
+SAMPLES = faosample.tex
 
 WD = $(shell pwd)
 CURRDIR = $(notdir ${WD})
