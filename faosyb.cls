@@ -149,6 +149,20 @@
         \rotatebox{45}{%
           \fontsize{6cm}{6cm}\selectfont
           DRAFT}}}}\fi}
+\newlength\nf@vert@sep
+\setlength\nf@vert@sep{60pt}
+\newlength\nf@width
+\newlength\nf@height
+\newlength\nf@captionheight
+\setlength\nf@captionheight{48\p@}
+\newlength\nf@sourceheight
+\setlength\nf@sourceheight{48\p@}
+\newlength\nf@margin
+\setlength\nf@margin{5\p@}
+\newlength\nf@trianglebase
+\setlength\nf@margin{10\p@}
+\newlength\chartwidth
+\newlength\chartheight
 \newcount\nonfloat@type
 \nonfloat@type=4\relax
 \def\newnon@float#1#2#3#4{%
@@ -164,7 +178,31 @@
   \expandafter\let\csname #1\endcsname\relax
   \expandafter\let\csname end#1\endcsname\relax
   \newenvironment{#1}{\non@float{#1}}{\endnon@float}}
-\def\non@float#1#2#3{}
+\def\non@float#1#2#3{
+  \def\@captype{#1}%
+  \def\nf@size{#2}%
+  \def\nf@placement{#3}%
+  \let\nf@source\@empty
+  \nf@width=\columnwidth
+  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep/2)%
+  \def\tempW{W}%
+  \def\tempT{T}%
+  \def\tempB{B}%
+  \ifx\nf@size\tempW
+    \nf@width=\textwidth
+  \fi
+  \ifx\nf@size\tempT
+    \nf@height=\textheight
+  \fi
+  \ifx\nf@size\tempB
+    \nf@width=\textwidth
+    \nf@height=\textheight
+  \fi
+  \chartheight=
+  \dimexpr(\nf@height-2\nf@margin-\nf@captionheight-\nf@sourceheight)%
+  \chartwidth=\dimexpr(\nf@width-2\nf@margin)%
+}
+\def\endnon@float{}
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
 \newnon@float{chart}{loc}{Chart}{List of Charts}

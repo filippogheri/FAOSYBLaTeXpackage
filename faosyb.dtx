@@ -360,15 +360,15 @@
 % types of floats defined by the class:
 % \DescribeEnv{chart}
 % \DescribeEnv{map}
-% \DescribeEnv{minitab}
+% \DescribeEnv{table}
 % \begin{description}
 % \item[chart] plots and other charts,
 % \item[map] mapped data.
-% \item[minitab] mini tables.
+% \item[table] mini tables.
 % \end{description}
 % \DescribeMacro{caption}
 % Each of these kinds of material is typeset using the corresponding
-% environment: |chart|, |minitab| or |map|.  Note that the caption for
+% environment: |chart|, |table| or |map|.  Note that the caption for
 % each of these environments \emph{must} precede the graphical
 % material, for example:
 % \begin{verbatim}
@@ -378,22 +378,22 @@
 %   \includegraphics{hunger.pdf}
 % \end{chart}
 % \end{verbatim}
-% The usual |table| environment produces an error: use either
-% |minitab| or |longtable| for tables on separate pages.  
+% Note that our class redefines |table| environemnt!.  For tables on
+% separate pages use |longtable|.
 %
-% \DescribeMacro{\textwidth}
+% \DescribeMacro{\chartwidth}
 % \DescribeMacro{\chartheight}
-% Inside a |chart|, |map| or |minitab| it is useful to know the size
+% Inside a |chart|, |map| or |table| it is useful to know the size
 % allocated for the graphics or table, for example, to be able to
-% scale the graphics.  Two lengths, \cs{textwidth} and
+% scale the graphics.  Two lengths, \cs{chartwidth} and
 % \cs{chartheight} provide this information, so the user can say, for
 % example,
 % \begin{verbatim}
-% \includegraphics[width=\textwidth, height=\chartheight]{theChart}
+% \includegraphics[width=\chartwidth, height=\chartheight]{theChart}
 % \end{verbatim}
 % 
 % \DescribeMacro{\Source}
-% Inside a a |chart|, |map| or |minitab| the macro
+% Inside a a |chart|, |map| or |table| the macro
 % \cs{Source}\marg{source} gives the source of the information, for
 % example,
 % \begin{verbatim}
@@ -949,7 +949,83 @@
 % In Faoyearbook we used float package.  Since we changed too much in
 % the internals, here we just rewrite the code from scratch.
 %
+% \begin{macro}{\nf@vert@sep}
+%   Vertical separation between the floats
+%    \begin{macrocode}
+\newlength\nf@vert@sep
+\setlength\nf@vert@sep{60pt}
+%    \end{macrocode}
+% \end{macro}
 %   
+% \begin{macro}{\nf@width}
+%   The width of the nonfloat
+%    \begin{macrocode}
+\newlength\nf@width
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@height}
+%   The height of the nonfloat
+%    \begin{macrocode}
+\newlength\nf@height
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@captionheight}
+%   The height reserved for the caption
+%    \begin{macrocode}
+\newlength\nf@captionheight
+\setlength\nf@captionheight{48\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@sourceheight}
+%   The height reserved for the source lines
+%    \begin{macrocode}
+\newlength\nf@sourceheight
+\setlength\nf@sourceheight{48\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@margin}
+%   Margin for floats
+%    \begin{macrocode}
+\newlength\nf@margin
+\setlength\nf@margin{5\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@trianglebase}
+%   The design requres a triangle under the caption.  Here it is
+%    \begin{macrocode}
+\newlength\nf@trianglebase
+\setlength\nf@margin{10\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\chartwidth}
+%   The resulting width of a chart
+%    \begin{macrocode}
+\newlength\chartwidth
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\chartheight}
+%   The resulting width of a chart
+%    \begin{macrocode}
+\newlength\chartheight
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
 % \begin{macro}{\nonfloat@type}
 %   The counter to keep the next type to assign
 %    \begin{macrocode}
@@ -1006,9 +1082,49 @@
 %
 % \begin{macro}{\non@float}
 %   Now we are ready to define the \cs{non@float} macro.  It has three
-%   parameters:  TYPE, SIZE and PLACEMENT.
+%   parameters:  TYPE, SIZE and PLACEMENT. \cs{nf@source} is the
+%   source of the float.
 %    \begin{macrocode}
-\def\non@float#1#2#3{}
+\def\non@float#1#2#3{
+  \def\@captype{#1}%
+  \def\nf@size{#2}%
+  \def\nf@placement{#3}%
+  \let\nf@source\@empty
+%    \end{macrocode}
+%
+% We calculate the size of the float
+%    \begin{macrocode}
+  \nf@width=\columnwidth
+  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep/2)%
+  \def\tempW{W}%
+  \def\tempT{T}%
+  \def\tempB{B}%
+  \ifx\nf@size\tempW
+    \nf@width=\textwidth
+  \fi
+  \ifx\nf@size\tempT
+    \nf@height=\textheight
+  \fi
+  \ifx\nf@size\tempB
+    \nf@width=\textwidth
+    \nf@height=\textheight
+  \fi
+  \chartheight=
+    \dimexpr(\nf@height-2\nf@margin-\nf@captionheight-\nf@sourceheight)%
+  \chartwidth=\dimexpr(\nf@width-2\nf@margin)%
+}
+%    \end{macrocode}
+%
+%  The float consists of three boxes:  \cs{nf@captionbox},
+%  \cs{nf@mainbox} and \cs{nf@sourcebox}.  Now we construct the main
+%  box. 
+% 
+% \end{macro}
+%
+% \begin{macro}{\endnon@float}
+%   The actual typesetting
+%    \begin{macrocode}
+\def\endnon@float{}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1020,14 +1136,14 @@
 %    \end{macrocode}
 %   
 % \end{macro}
-% \begin{macro}{\minitab}
+% \begin{macro}{\table}
 %   Another one
 %    \begin{macrocode}
 \newnon@float{table}{lot}{Table}{List of Tables}
 %    \end{macrocode}
 %   
 % \end{macro}
-% \begin{macro}{\minitab}
+% \begin{macro}{\chart}
 %   And another one
 %    \begin{macrocode}
 \newnon@float{chart}{loc}{Chart}{List of Charts}
