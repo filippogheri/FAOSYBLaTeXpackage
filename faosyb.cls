@@ -151,12 +151,23 @@
           DRAFT}}}}\fi}
 \newcount\nonfloat@type
 \nonfloat@type=4\relax
-\def\newnonfloat#1#2#3#4{%
+\def\newnon@float#1#2#3#4{%
   \expandafter\ifx\csname ftype@#1\endcsname\relax
     \expandafter\edef\csname ftype@#1\endcsname{\the\nonfloat@type}%
     \multiply\nonfloat@type by 2\relax
   \fi
-}
+  \expandafter\def\csname ext@#1\endcsname{#2}%
+  \expandafter\ifx\csname the#1\endcsname\relax
+  \newcounter{#1}\fi
+  \expandafter\edef\csname fnum@#1\endcsname{#3~\csname
+    the#1\endcsname}%
+  \expandafter\let\csname #1\endcsname\relax
+  \expandafter\let\csname end#1\endcsname\relax
+  \newenvironment{#1}{\non@float{#1}}{\endnon@float}}
+\def\non@float#1#2#3{}
+\newnon@float{map}{lom}{Map}{List of Maps}
+\newnon@float{table}{lot}{Table}{List of Tables}
+\newnon@float{chart}{loc}{Chart}{List of Charts}
 \endinput
 %%
 %% End of file `faosyb.cls'.

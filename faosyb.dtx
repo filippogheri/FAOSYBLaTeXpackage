@@ -358,19 +358,17 @@
 %  
 % There are three
 % types of floats defined by the class:
-% \DescribeEnv{table}
 % \DescribeEnv{chart}
 % \DescribeEnv{map}
 % \DescribeEnv{minitab}
 % \begin{description}
-% \item[table] tabular material,
 % \item[chart] plots and other charts,
 % \item[map] mapped data.
 % \item[minitab] mini tables.
 % \end{description}
 % \DescribeMacro{caption}
 % Each of these kinds of material is typeset using the corresponding
-% environment: |table|, |chart|, |minitab| or |map|.  Note that the caption for
+% environment: |chart|, |minitab| or |map|.  Note that the caption for
 % each of these environments \emph{must} precede the graphical
 % material, for example:
 % \begin{verbatim}
@@ -380,6 +378,28 @@
 %   \includegraphics{hunger.pdf}
 % \end{chart}
 % \end{verbatim}
+% The usual |table| environment produces an error: use either
+% |minitab| or |longtable| for tables on separate pages.  
+%
+% \DescribeMacro{\textwidth}
+% \DescribeMacro{\chartheight}
+% Inside a |chart|, |map| or |minitab| it is useful to know the size
+% allocated for the graphics or table, for example, to be able to
+% scale the graphics.  Two lengths, \cs{textwidth} and
+% \cs{chartheight} provide this information, so the user can say, for
+% example,
+% \begin{verbatim}
+% \includegraphics[width=\textwidth, height=\chartheight]{theChart}
+% \end{verbatim}
+% 
+% \DescribeMacro{\Source}
+% Inside a a |chart|, |map| or |minitab| the macro
+% \cs{Source}\marg{source} gives the source of the information, for
+% example,
+% \begin{verbatim}
+% \Source{FAO, Statistical Division [FAOSTAT]}
+% \end{verbatim}
+% 
 %
 % \DescribeMacro{\listoftables}
 % \DescribeMacro{\listofcharts}
@@ -927,7 +947,7 @@
 %\label{sec:floats}
 %
 % In Faoyearbook we used float package.  Since we changed too much in
-% the internals, here we just reuse its code.
+% the internals, here we just rewrite the code from scratch.
 %
 %   
 % \begin{macro}{\nonfloat@type}
@@ -940,15 +960,15 @@
 % \end{macro}
 %
 %
-% \begin{macro}{\newnonfloat}
-%   The macro \cs{newnonfloat} has the following arguments:  TYPE,
+% \begin{macro}{\newnon@float}
+%   The macro \cs{newnon@float} has the following arguments:  TYPE,
 %   EXT, NAME, LISTNAME, for example
 % \begin{verbatim}
-% \newnonfloat{map}{lom}{Map}{List of Maps}
+% \newnon@float{map}{lom}{Map}{List of Maps}
 % \end{verbatim}
 %   It defines a nonfloat with these parameters.
 %    \begin{macrocode}
-\def\newnonfloat#1#2#3#4{%
+\def\newnon@float#1#2#3#4{%
 %    \end{macrocode}
 %   First, we need to define |\ftype@TYPE|: the type of the float.
 %   Note that tables are taken, so we need to make a special care of
@@ -961,9 +981,57 @@
 %    \end{macrocode}
 % Now we define the extension for the floats
 %    \begin{macrocode}
-}
+  \expandafter\def\csname ext@#1\endcsname{#2}%
 %    \end{macrocode}
-% 
+% The macro \cs{fnum@TYPE} formats the line like ``Figure 1''.  We
+% need to check whether the counter is defined
+%    \begin{macrocode}
+  \expandafter\ifx\csname the#1\endcsname\relax
+  \newcounter{#1}\fi
+  \expandafter\edef\csname fnum@#1\endcsname{#3~\csname
+    the#1\endcsname}%
+%    \end{macrocode}
+% Now we want to define the environment TYPE.  Since it might be
+% already defined, we first delete this definition, otherwise
+% \cs{newenvironment} might throw an error
+%    \begin{macrocode}
+  \expandafter\let\csname #1\endcsname\relax
+  \expandafter\let\csname end#1\endcsname\relax
+%    \end{macrocode}
+%  And the actual definition
+%    \begin{macrocode}
+  \newenvironment{#1}{\non@float{#1}}{\endnon@float}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\non@float}
+%   Now we are ready to define the \cs{non@float} macro.  It has three
+%   parameters:  TYPE, SIZE and PLACEMENT.
+%    \begin{macrocode}
+\def\non@float#1#2#3{}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\map}
+%   A standard nonfloat:
+%    \begin{macrocode}
+\newnon@float{map}{lom}{Map}{List of Maps}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\minitab}
+%   Another one
+%    \begin{macrocode}
+\newnon@float{table}{lot}{Table}{List of Tables}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\minitab}
+%   And another one
+%    \begin{macrocode}
+\newnon@float{chart}{loc}{Chart}{List of Charts}
+%    \end{macrocode}
 %   
 % \end{macro}
 %
@@ -975,3 +1043,5 @@
 %\PrintIndex
 %
 \endinput
+
+
