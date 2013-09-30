@@ -39,7 +39,7 @@
 \RequirePackage[table,cmyk]{xcolor}
 \RequirePackage{tikz,geometry,dcolumn}
 \RequirePackage{fancyhdr}
-\RequirePackage{caption,lscape,longtable,siunitx,booktabs}
+\RequirePackage{lscape,longtable,siunitx,booktabs}
 \RequirePackage{multicol,atbegshi,picture,hhline,afterpage}
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8x]{inputenc}
@@ -154,17 +154,19 @@
 \newlength\nf@width
 \newlength\nf@height
 \newlength\nf@captionheight
-\setlength\nf@captionheight{48\p@}
+\setlength\nf@captionheight{32\p@}
 \newlength\nf@sourceheight
 \setlength\nf@sourceheight{48\p@}
 \newlength\nf@margin
-\setlength\nf@margin{5\p@}
+\setlength\nf@margin{12\p@}
 \newlength\nf@trianglebase
-\setlength\nf@margin{10\p@}
+\setlength\nf@trianglebase{12\p@}
 \newlength\chartwidth
 \newlength\chartheight
 \newcount\nonfloat@type
 \nonfloat@type=4\relax
+\newbox\nf@contentsbox
+\newbox\nf@mainbox
 \def\newnon@float#1#2#3#4{%
   \expandafter\ifx\csname ftype@#1\endcsname\relax
     \expandafter\edef\csname ftype@#1\endcsname{\the\nonfloat@type}%
@@ -173,7 +175,7 @@
   \expandafter\def\csname ext@#1\endcsname{#2}%
   \expandafter\ifx\csname the#1\endcsname\relax
   \newcounter{#1}\fi
-  \expandafter\edef\csname fnum@#1\endcsname{#3~\csname
+  \expandafter\def\csname fnum@#1\endcsname{#3~\csname
     the#1\endcsname}%
   \expandafter\let\csname #1\endcsname\relax
   \expandafter\let\csname end#1\endcsname\relax
@@ -183,6 +185,10 @@
   \def\nf@size{#2}%
   \def\nf@placement{#3}%
   \let\nf@source\@empty
+\long\def\@makecaption##1##2{\long\gdef\nf@caption{%
+    {\bfseries\large\color{white}
+      \MakeUppercase{##1}: ##2}}}%
+\gdef\nf@caption{}%
   \nf@width=\columnwidth
   \nf@height=\dimexpr(\textheight/2-\nf@vert@sep/2)%
   \def\tempW{W}%
@@ -199,10 +205,35 @@
     \nf@height=\textheight
   \fi
   \chartheight=
-  \dimexpr(\nf@height-2\nf@margin-\nf@captionheight-\nf@sourceheight)%
+    \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
+    -2\nf@margin-\nf@trianglebase)%
   \chartwidth=\dimexpr(\nf@width-2\nf@margin)%
+  \global\setbox\nf@contentsbox
+    \color@vbox
+     \normalcolor
+     \vbox to \chartheight
+     \bgroup
+     \hsize\chartwidth
+     \@parboxrestore
+     \@floatboxreset
 }
-\def\endnon@float{}
+\def\endnon@float{\@endfloatbox\par
+  \hsize=\nf@width
+  \setbox\nf@mainbox=\vbox to \nf@height\bgroup
+    \hsize=\chartwidth
+    \noindent
+    \begin{picture}(0,0)
+      \put(0,0){\color{@bgcolor}%
+        \begin{tikzpicture}[baseline=(current bounding box.north)]
+          \fill (0,0) -- (\nf@trianglebase,0) -- (0.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
+        \end{tikzpicture}}
+    \end{picture}%
+    \color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{\z@}%
+    \hskip\nf@margin\vbox to \nf@captionheight\bgroup
+    \nf@caption\vfill
+    \egroup\par\nointerlineskip\vskip\nf@trianglebase
+    \noindent\hskip\nf@margin\box\nf@contentsbox\vfill\egroup
+  \box\nf@mainbox}
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
 \newnon@float{chart}{loc}{Chart}{List of Charts}

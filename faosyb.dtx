@@ -715,7 +715,7 @@
 \RequirePackage[table,cmyk]{xcolor}
 \RequirePackage{tikz,geometry,dcolumn}
 \RequirePackage{fancyhdr}
-\RequirePackage{caption,lscape,longtable,siunitx,booktabs}
+\RequirePackage{lscape,longtable,siunitx,booktabs}
 \RequirePackage{multicol,atbegshi,picture,hhline,afterpage}
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8x]{inputenc}
@@ -977,7 +977,7 @@
 %   The height reserved for the caption
 %    \begin{macrocode}
 \newlength\nf@captionheight
-\setlength\nf@captionheight{48\p@}
+\setlength\nf@captionheight{32\p@}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -991,11 +991,12 @@
 %   
 % \end{macro}
 %
+%
 % \begin{macro}{\nf@margin}
 %   Margin for floats
 %    \begin{macrocode}
 \newlength\nf@margin
-\setlength\nf@margin{5\p@}
+\setlength\nf@margin{12\p@}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1004,7 +1005,7 @@
 %   The design requres a triangle under the caption.  Here it is
 %    \begin{macrocode}
 \newlength\nf@trianglebase
-\setlength\nf@margin{10\p@}
+\setlength\nf@trianglebase{12\p@}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1035,6 +1036,21 @@
 %   
 % \end{macro}
 %
+% \begin{macro}{\nf@contentsbox}
+%   The box to keep the contents of the float
+%    \begin{macrocode}
+\newbox\nf@contentsbox
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@mainbox}
+%   The box for the float
+%    \begin{macrocode}
+\newbox\nf@mainbox
+%    \end{macrocode}
+%   
+% \end{macro}
 %
 % \begin{macro}{\newnon@float}
 %   The macro \cs{newnon@float} has the following arguments:  TYPE,
@@ -1062,9 +1078,9 @@
 % The macro \cs{fnum@TYPE} formats the line like ``Figure 1''.  We
 % need to check whether the counter is defined
 %    \begin{macrocode}
-  \expandafter\ifx\csname the#1\endcsname\relax
+  \expandafter\ifx\csname the#1\endcsname\relax  
   \newcounter{#1}\fi
-  \expandafter\edef\csname fnum@#1\endcsname{#3~\csname
+  \expandafter\def\csname fnum@#1\endcsname{#3~\csname
     the#1\endcsname}%
 %    \end{macrocode}
 % Now we want to define the environment TYPE.  Since it might be
@@ -1092,6 +1108,15 @@
   \let\nf@source\@empty
 %    \end{macrocode}
 %
+% Define the caption producing command:
+%    \begin{macrocode}
+\long\def\@makecaption##1##2{\long\gdef\nf@caption{%
+    {\bfseries\large\color{white}
+      \MakeUppercase{##1}: ##2}}}%
+\gdef\nf@caption{}%
+%    \end{macrocode}
+% 
+%
 % We calculate the size of the float
 %    \begin{macrocode}
   \nf@width=\columnwidth
@@ -1110,21 +1135,47 @@
     \nf@height=\textheight
   \fi
   \chartheight=
-    \dimexpr(\nf@height-2\nf@margin-\nf@captionheight-\nf@sourceheight)%
+    \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
+    -2\nf@margin-\nf@trianglebase)%
   \chartwidth=\dimexpr(\nf@width-2\nf@margin)%
-}
 %    \end{macrocode}
 %
-%  The float consists of three boxes:  \cs{nf@captionbox},
-%  \cs{nf@mainbox} and \cs{nf@sourcebox}.  Now we construct the main
-%  box. 
+%  Now we construct the main box.
+%    \begin{macrocode}
+  \global\setbox\nf@contentsbox
+    \color@vbox
+     \normalcolor
+     \vbox to \chartheight
+     \bgroup
+     \hsize\chartwidth
+     \@parboxrestore
+     \@floatboxreset
+}
+%    \end{macrocode}
+%  
 % 
 % \end{macro}
 %
 % \begin{macro}{\endnon@float}
 %   The actual typesetting
 %    \begin{macrocode}
-\def\endnon@float{}
+\def\endnon@float{\@endfloatbox\par
+  \hsize=\nf@width
+  \setbox\nf@mainbox=\vbox to \nf@height\bgroup
+    \hsize=\chartwidth
+    \noindent
+    \begin{picture}(0,0)
+      \put(0,0){\color{@bgcolor}%
+        \begin{tikzpicture}[baseline=(current bounding box.north)]
+          \fill (0,0) -- (\nf@trianglebase,0) -- (0.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
+        \end{tikzpicture}}
+    \end{picture}%
+    \color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{\z@}%
+    \hskip\nf@margin\vbox to \nf@captionheight\bgroup    
+    \nf@caption\vfill
+    \egroup\par\nointerlineskip\vskip\nf@trianglebase
+    \noindent\hskip\nf@margin\box\nf@contentsbox\vfill\egroup
+  \box\nf@mainbox}
 %    \end{macrocode}
 %   
 % \end{macro}
