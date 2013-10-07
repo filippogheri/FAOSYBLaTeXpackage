@@ -38,6 +38,7 @@
 \RequirePackage{graphicx,xkeyval}
 \RequirePackage[table,cmyk]{xcolor}
 \RequirePackage{tikz,geometry,dcolumn}
+\usetikzlibrary{calc}
 \RequirePackage{fancyhdr}
 \RequirePackage{lscape,longtable,siunitx,booktabs}
 \RequirePackage{multicol,atbegshi,picture,hhline,afterpage}
@@ -184,7 +185,8 @@
   \def\@captype{#1}%
   \def\nf@size{#2}%
   \def\nf@placement{#3}%
-  \let\nf@source\@empty
+  \global\let\nf@source\@empty
+  \def\source##1{\gdef\nf@source{##1}}
 \long\def\@makecaption##1##2{\long\gdef\nf@caption{%
     {\bfseries\large\color{white}
       \MakeUppercase{##1}: ##2}}}%
@@ -207,7 +209,7 @@
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
     -2\nf@margin-\nf@trianglebase)%
-  \chartwidth=\dimexpr(\nf@width-2\nf@margin)%
+  \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
   \global\setbox\nf@contentsbox
     \color@vbox
      \normalcolor
@@ -222,17 +224,45 @@
   \setbox\nf@mainbox=\vbox to \nf@height\bgroup
     \hsize=\chartwidth
     \noindent
-    \begin{picture}(0,0)
+    \begin{picture}(0,0)%
       \put(0,0){\color{@bgcolor}%
         \begin{tikzpicture}[baseline=(current bounding box.north)]
-          \fill (0,0) -- (\nf@trianglebase,0) -- (0.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
+          \fill (0,0) -- (\nf@trianglebase,0) --
+          (0.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
         \end{tikzpicture}}
     \end{picture}%
-    \color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{\z@}%
-    \hskip\nf@margin\vbox to \nf@captionheight\bgroup
+    \def\@tempa{chart}%
+    \ifx\@tempa\@captype
+    \begin{picture}(0,0)%
+      \put(0,0){\color{@bgcolor}%
+        \begin{tikzpicture}[baseline=(current bounding box.north)]
+          \draw(0,0) -- (\nf@width,0);
+          \draw (0.5\nf@trianglebase,-2\nf@trianglebase) --
+          (0.5\nf@trianglebase,-\chartheight-2\nf@trianglebase
+          -\nf@margin) --
+          (\nf@width-\pgflinewidth, -\chartheight-2\nf@trianglebase
+          -\nf@margin) -- (\nf@width-\pgflinewidth, 0);
+        \end{tikzpicture}}
+    \end{picture}%
+    \fi
+    {\color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{.1\p@}}%
+    \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
+    \vbox to \nf@captionheight\bgroup
     \nf@caption\vfill
     \egroup\par\nointerlineskip\vskip\nf@trianglebase
-    \noindent\hskip\nf@margin\box\nf@contentsbox\vfill\egroup
+    \vskip\nf@margin
+    \noindent\hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
+    \box\nf@contentsbox\par\nointerlineskip
+    \vskip\nf@margin
+    \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
+    \vbox to \nf@sourceheight\bgroup
+    \ifx\nf@source\@empty\else
+    \noindent{\color{@bgcolor}%
+      \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
+      \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
+      \rule{.2em}{.2em}\par}
+    \noindent Source: \nf@source\par\vfill\fi\egroup
+    \vfill\egroup
   \box\nf@mainbox}
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
