@@ -151,7 +151,7 @@
           \fontsize{6cm}{6cm}\selectfont
           DRAFT}}}}\fi}
 \newlength\nf@vert@sep
-\setlength\nf@vert@sep{60pt}
+\setlength\nf@vert@sep{30pt}
 \newlength\nf@width
 \newlength\nf@height
 \newlength\nf@captionheight
@@ -164,6 +164,8 @@
 \setlength\nf@trianglebase{12\p@}
 \newlength\chartwidth
 \newlength\chartheight
+\newskip\nf@topskip
+\newskip\nf@bottomskip
 \newcount\nonfloat@type
 \nonfloat@type=4\relax
 \newbox\nf@contentsbox
@@ -181,10 +183,14 @@
   \expandafter\let\csname #1\endcsname\relax
   \expandafter\let\csname end#1\endcsname\relax
   \newenvironment{#1}{\non@float{#1}}{\endnon@float}}
+\def\@getfirstletter#1{\@@getfirstletter#1}
+\def\@@getfirstletter#1{#1\@gobbleword}
+\def\@gobbleword#1\@endword{}
 \def\non@float#1#2#3{
   \def\@captype{#1}%
   \def\nf@size{#2}%
   \def\nf@placement{#3}%
+  \lowercase{\xdef\nf@vert@pos{\@getfirstletter#3\@endword}}
   \global\let\nf@source\@empty
   \def\source##1{\gdef\nf@source{##1}}
 \long\def\@makecaption##1##2{\long\gdef\nf@caption{%
@@ -192,7 +198,14 @@
       \MakeUppercase{##1}: ##2}}}%
 \gdef\nf@caption{}%
   \nf@width=\columnwidth
-  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep/2)%
+  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep)%
+  \if\nf@vert@pos u\relax
+    \nf@topskip=\z@
+    \nf@bottomskip=\nf@vert@sep
+  \else
+    \nf@topskip=\nf@vert@sep
+    \nf@bottomskip=\z@
+  \fi
   \def\tempW{W}%
   \def\tempT{T}%
   \def\tempB{B}%
@@ -201,15 +214,20 @@
   \fi
   \ifx\nf@size\tempT
     \nf@height=\textheight
+    \nf@topskip=\z@
+    \nf@bottomskip=\z@
   \fi
   \ifx\nf@size\tempB
     \nf@width=\textwidth
     \nf@height=\textheight
+    \nf@topskip=\z@
+    \nf@bottomskip=\z@
   \fi
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
     -2\nf@margin-\nf@trianglebase)%
   \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
+  \nf@height=\dimexpr(\nf@height+\nf@topskip+\nf@bottomskip)%
   \global\setbox\nf@contentsbox
     \color@vbox
      \normalcolor
@@ -223,6 +241,7 @@
   \hsize=\nf@width
   \setbox\nf@mainbox=\vbox to \nf@height\bgroup
     \hsize=\chartwidth
+    \vskip\nf@topskip
     \noindent
     \begin{picture}(0,0)%
       \put(0,0){\color{@bgcolor}%
@@ -267,6 +286,25 @@
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
 \newnon@float{chart}{loc}{Chart}{List of Charts}
+\newinsert\insert@S@ul
+\dimen\insert@S@ul=\textheight
+\newinsert\insert@S@ur
+\newinsert\insert@S@ll
+\newinsert\insert@S@lr
+\newinsert\insert@S@UL
+\newinsert\insert@S@UR
+\newinsert\insert@S@LL
+\newinsert\insert@S@LR
+\newinsert\insert@T@ul
+\newinsert\insert@T@ur
+\newinsert\insert@T@UL
+\newinsert\insert@T@UR
+\newinsert\insert@W@ul
+\newinsert\insert@W@ll
+\newinsert\insert@W@UL
+\newinsert\insert@W@LL
+\newinsert\insert@B@ul
+\newinsert\insert@B@UL
 \endinput
 %%
 %% End of file `faosyb.cls'.

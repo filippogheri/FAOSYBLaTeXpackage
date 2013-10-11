@@ -954,7 +954,7 @@
 %   Vertical separation between the floats
 %    \begin{macrocode}
 \newlength\nf@vert@sep
-\setlength\nf@vert@sep{60pt}
+\setlength\nf@vert@sep{30pt}
 %    \end{macrocode}
 % \end{macro}
 %   
@@ -1027,6 +1027,17 @@
 %   
 % \end{macro}
 %
+% \begin{macro}{\nf@topskip}
+%   Top separation for a nonfloat
+\newskip\nf@topskip
+% \end{macro}
+%
+% \begin{macro}{\nf@bottomskip}
+%   Bottom separation for a nonfloat
+\newskip\nf@bottomskip
+% \end{macro}
+%
+%
 %
 % \begin{macro}{\nonfloat@type}
 %   The counter to keep the next type to assign
@@ -1097,6 +1108,21 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@getfirstletter}
+%   An aux macro to get a first letter of a word.  Used in constructs
+% \begin{verbatim}
+% \edef\U{\@getfirstletter{AAAAA\@endword}}}
+% \end{verbatim}
+%   
+%    \begin{macrocode}
+\def\@getfirstletter#1{\@@getfirstletter#1}
+\def\@@getfirstletter#1{#1\@gobbleword}
+\def\@gobbleword#1\@endword{}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
 % \begin{macro}{\non@float}
 %   Now we are ready to define the \cs{non@float} macro.  It has three
 %   parameters:  TYPE, SIZE and PLACEMENT. \cs{nf@source} is the
@@ -1106,6 +1132,10 @@
   \def\@captype{#1}%
   \def\nf@size{#2}%
   \def\nf@placement{#3}%
+%    \end{macrocode}
+% The macro |\nf@vert@pos| is either |u| or |l|
+%    \begin{macrocode}
+  \lowercase{\xdef\nf@vert@pos{\@getfirstletter#3\@endword}}
   \global\let\nf@source\@empty
 %    \end{macrocode}
 %
@@ -1124,10 +1154,17 @@
 %    \end{macrocode}
 % 
 %
-% We calculate the size of the float
+% We calculate the size of the float and skips
 %    \begin{macrocode}
-  \nf@width=\columnwidth
-  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep/2)%
+  \nf@width=\columnwidth  
+  \nf@height=\dimexpr(\textheight/2-\nf@vert@sep)%
+  \if\nf@vert@pos u\relax
+    \nf@topskip=\z@
+    \nf@bottomskip=\nf@vert@sep
+  \else
+    \nf@topskip=\nf@vert@sep
+    \nf@bottomskip=\z@
+  \fi
   \def\tempW{W}%
   \def\tempT{T}%
   \def\tempB{B}%
@@ -1136,15 +1173,20 @@
   \fi
   \ifx\nf@size\tempT
     \nf@height=\textheight
+    \nf@topskip=\z@
+    \nf@bottomskip=\z@
   \fi
   \ifx\nf@size\tempB
     \nf@width=\textwidth
     \nf@height=\textheight
+    \nf@topskip=\z@
+    \nf@bottomskip=\z@
   \fi
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
     -2\nf@margin-\nf@trianglebase)%
   \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
+  \nf@height=\dimexpr(\nf@height+\nf@topskip+\nf@bottomskip)%
 %    \end{macrocode}
 %
 %  Now we construct the main box.
@@ -1170,6 +1212,7 @@
   \hsize=\nf@width
   \setbox\nf@mainbox=\vbox to \nf@height\bgroup
     \hsize=\chartwidth
+    \vskip\nf@topskip
     \noindent
     \begin{picture}(0,0)%
       \put(0,0){\color{@bgcolor}%
@@ -1236,6 +1279,38 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+%
+%\subsection{Output Routine}
+%\label{sec:output_routine}
+%
+% This is hairy because output routines are hairy\dots
+%
+% We need several insert boxes.  Naming convention: the letter for the
+% box size and two letter code for the location
+%    \begin{macrocode}
+\newinsert\insert@S@ul
+\dimen\insert@S@ul=\textheight
+\newinsert\insert@S@ur
+\newinsert\insert@S@ll
+\newinsert\insert@S@lr
+\newinsert\insert@S@UL
+\newinsert\insert@S@UR
+\newinsert\insert@S@LL
+\newinsert\insert@S@LR
+\newinsert\insert@T@ul
+\newinsert\insert@T@ur
+\newinsert\insert@T@UL
+\newinsert\insert@T@UR
+\newinsert\insert@W@ul
+\newinsert\insert@W@ll
+\newinsert\insert@W@UL
+\newinsert\insert@W@LL
+\newinsert\insert@B@ul
+\newinsert\insert@B@UL
+%    \end{macrocode}
+% 
+% 
 %
 %\Finale
 %\clearpage
