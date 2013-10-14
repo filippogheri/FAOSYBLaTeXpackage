@@ -282,29 +282,31 @@
       \rule{.2em}{.2em}\par}
     \noindent Source: \nf@source\par\vfill\fi\egroup
     \vfill\egroup
-  \box\nf@mainbox}
+    \edef\nf@currbox{\expandafter\csname nfbox@\nf@size
+      @\nf@placement\endcsname}%
+    \global\setbox\nf@currbox=
+    \vbox{\unvbox\nf@currbox\nointerlineskip\box\nf@mainbox}}
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
 \newnon@float{chart}{loc}{Chart}{List of Charts}
-\newinsert\insert@S@ul
-\dimen\insert@S@ul=\textheight
-\newinsert\insert@S@ur
-\newinsert\insert@S@ll
-\newinsert\insert@S@lr
-\newinsert\insert@S@UL
-\newinsert\insert@S@UR
-\newinsert\insert@S@LL
-\newinsert\insert@S@LR
-\newinsert\insert@T@ul
-\newinsert\insert@T@ur
-\newinsert\insert@T@UL
-\newinsert\insert@T@UR
-\newinsert\insert@W@ul
-\newinsert\insert@W@ll
-\newinsert\insert@W@UL
-\newinsert\insert@W@LL
-\newinsert\insert@B@ul
-\newinsert\insert@B@UL
+\newbox\nfbox@S@ul
+\newbox\nfbox@S@ur
+\newbox\nfbox@S@ll
+\newbox\nfbox@S@lr
+\newbox\nfbox@S@UL
+\newbox\nfbox@S@UR
+\newbox\nfbox@S@LL
+\newbox\nfbox@S@LR
+\newbox\nfbox@T@ul
+\newbox\nfbox@T@ur
+\newbox\nfbox@T@UL
+\newbox\nfbox@T@UR
+\newbox\nfbox@W@ul
+\newbox\nfbox@W@ll
+\newbox\nfbox@W@UL
+\newbox\nfbox@W@LL
+\newbox\nfbox@B@ul
+\newbox\nfbox@B@UL
 \endinput
 %%
 %% End of file `faosyb.cls'.
