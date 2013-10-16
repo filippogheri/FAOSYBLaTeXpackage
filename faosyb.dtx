@@ -1314,7 +1314,38 @@
 \newbox\nfbox@B@UL
 %    \end{macrocode}
 % 
-% 
+% \begin{macro}{\nf@even@ht}
+%   The combined height of even page nf boxes:
+%    \begin{macrocode}
+\def\nf@even@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
+  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul)}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@odd@ht}
+%   Same for odd page
+%    \begin{macrocode}
+\def\nf@odd@ht{\dimexpr(\ht\nfbox@S@UL+\ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
+  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@total@ht}
+%   And the total height
+%    \begin{macrocode}
+\def\nf@total@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
+  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul+
+  \ht\nfbox@S@UL+\ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
+  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
+%    \end{macrocode}
+%   
+% \end{macro}
 %
 %\Finale
 %\clearpage

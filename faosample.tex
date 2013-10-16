@@ -17,6 +17,12 @@
 \end{chart}
 \clearpage
 \makeatletter
-\unvbox\nfbox@S@ul
+\expandafter\the\nf@odd@ht\par
+\expandafter\the\nf@even@ht\par
+\expandafter\the\nf@total@ht\par
+\unvbox\nfbox@S@ul\par
+\expandafter\the\nf@odd@ht\par
+\expandafter\the\nf@even@ht\par
+\expandafter\the\nf@total@ht\par
 \makeatother
 \end{document}

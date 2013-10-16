@@ -307,6 +307,18 @@
 \newbox\nfbox@W@LL
 \newbox\nfbox@B@ul
 \newbox\nfbox@B@UL
+\def\nf@even@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
+  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul)}
+\def\nf@odd@ht{\dimexpr(\ht\nfbox@S@UL+\ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
+  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
+\def\nf@total@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
+  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul+
+  \ht\nfbox@S@UL+\ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
+  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
 \endinput
 %%
 %% End of file `faosyb.cls'.
