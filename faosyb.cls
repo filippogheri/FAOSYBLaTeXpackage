@@ -319,6 +319,57 @@
   \ht\nfbox@S@UL+\ht\nfbox@S@UR+
   \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
   2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
+\output {%
+  \ifodd\c@page
+    \global\let\curr@nf@ht\nf@odd@ht
+    \global\let\curr@nfbox@S@ul\nfbox@S@UL
+    \global\let\curr@nfbox@S@ur\nfbox@S@UR
+    \global\let\curr@nfbox@S@ll\nfbox@S@LL
+    \global\let\curr@nfbox@S@lr\nfbox@S@LR
+    \global\let\curr@nfbox@T@ul\nfbox@T@UL
+    \global\let\curr@nfbox@T@ur\nfbox@T@UR
+    \global\let\curr@nfbox@W@ul\nfbox@W@UL
+    \global\let\curr@nfbox@W@ll\nfbox@W@LL
+    \global\let\curr@nfbox@B@ul\nfbox@B@UL
+  \else
+    \global\let\curr@nf@ht\nf@even@ht
+    \global\let\curr@nfbox@S@ul\nfbox@S@ul
+    \global\let\curr@nfbox@S@ur\nfbox@S@ur
+    \global\let\curr@nfbox@S@ll\nfbox@S@ll
+    \global\let\curr@nfbox@S@lr\nfbox@S@lr
+    \global\let\curr@nfbox@T@ul\nfbox@T@ul
+    \global\let\curr@nfbox@T@ur\nfbox@T@ur
+    \global\let\curr@nfbox@W@ul\nfbox@W@ul
+    \global\let\curr@nfbox@W@ll\nfbox@W@ll
+    \global\let\curr@nfbox@B@ul\nfbox@B@ul
+  \fi
+  \let \par \@@par
+  \ifnum \outputpenalty<-\@M
+    \@specialoutput
+  \else
+    \@makecol
+    \@opcol
+    \@startcolumn
+    \@whilesw \if@fcolmade \fi
+      {%
+       \@opcol\@startcolumn}%
+  \fi
+  \ifnum \outputpenalty>-\@Miv
+    \ifdim \@colroom<1.5\baselineskip
+      \ifdim \@colroom<\textheight
+        \@latex@warning@no@line {Text page \thepage\space
+                               contains only floats}%
+        \@emptycol
+      \else
+        \global \vsize \@colroom
+      \fi
+    \else
+      \global \vsize \@colroom
+    \fi
+  \else
+    \global \vsize \maxdimen
+  \fi
+}
 \endinput
 %%
 %% End of file `faosyb.cls'.
