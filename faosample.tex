@@ -1,28 +1,21 @@
+%\tracingmacros=1
 \documentclass[print,Draft]{faosyb}
 \usepackage{lipsum}
 \begin{document}
 \colorlet{@bgcolor}{blue}
-\begin{map}{S}{ul}
-\caption{Ancient Roma \newline (Trajan times)}
-\label{map:roma}
-\includegraphics[width=\chartwidth,height=\chartheight]{Rome}
-\source{Wikipedia}
-\end{map}
-\lipsum
-\begin{chart}{S}{ul}
-\caption{Incarceration ratest acroos countries}
-\label{chart:incarceration}
-\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
-\source{Wikipedia}
-\end{chart}
-\clearpage
-\makeatletter
-\expandafter\the\nf@odd@ht\par
-\expandafter\the\nf@even@ht\par
-\expandafter\the\nf@total@ht\par
-\unvbox\nfbox@S@ul\par
-\expandafter\the\nf@odd@ht\par
-\expandafter\the\nf@even@ht\par
-\expandafter\the\nf@total@ht\par
-\makeatother
+% \begin{chart}{S}{UL}
+% \caption{Incarceration ratest acroos countries}
+% \label{chart:incarceration}
+% \includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
+% \source{Wikipedia}
+% \end{chart}
+% \begin{map}{W}{ul}
+% \caption{Ancient Roma \newline (Trajan times)}
+% \label{map:roma}
+% \includegraphics[width=\chartwidth,height=\chartheight]{Rome}
+% \source{Wikipedia}
+% \end{map}
+\lipsum[1-15]
+\textcolor{red}{a}\footnote{b}
 \end{document}
+

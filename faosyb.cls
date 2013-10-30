@@ -307,21 +307,11 @@
 \newbox\nfbox@W@LL
 \newbox\nfbox@B@ul
 \newbox\nfbox@B@UL
-\def\nf@even@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
-  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
-  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul)}
-\def\nf@odd@ht{\dimexpr(\ht\nfbox@S@UL+\ht\nfbox@S@UR+
-  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
-  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
-\def\nf@total@ht{\dimexpr(\ht\nfbox@S@ul+\ht\nfbox@S@ur+
-  \ht\nfbox@S@ll+\ht\nfbox@S@lr+\ht\nfbox@T@ul+\ht\nfbox@T@ur+
-  2\ht\nfbox@W@ul+2\ht\nfbox@W@ll+2\ht\nfbox@B@ul+
-  \ht\nfbox@S@UL+\ht\nfbox@S@UR+
-  \ht\nfbox@S@LL+\ht\nfbox@S@LR+\ht\nfbox@T@UL+\ht\nfbox@T@UR+
-  2\ht\nfbox@W@UL+2\ht\nfbox@W@LL+2\ht\nfbox@B@UL)}
-\output {%
+\edef\standard@output{\the\output}
+\output{\if@twocolumn\the\nf@output\else\standard@output\fi}
+\newtoks\nf@output
+\nf@output {%
   \ifodd\c@page
-    \global\let\curr@nf@ht\nf@odd@ht
     \global\let\curr@nfbox@S@ul\nfbox@S@UL
     \global\let\curr@nfbox@S@ur\nfbox@S@UR
     \global\let\curr@nfbox@S@ll\nfbox@S@LL
@@ -332,7 +322,6 @@
     \global\let\curr@nfbox@W@ll\nfbox@W@LL
     \global\let\curr@nfbox@B@ul\nfbox@B@UL
   \else
-    \global\let\curr@nf@ht\nf@even@ht
     \global\let\curr@nfbox@S@ul\nfbox@S@ul
     \global\let\curr@nfbox@S@ur\nfbox@S@ur
     \global\let\curr@nfbox@S@ll\nfbox@S@ll
@@ -343,33 +332,169 @@
     \global\let\curr@nfbox@W@ll\nfbox@W@ll
     \global\let\curr@nfbox@B@ul\nfbox@B@ul
   \fi
-  \let \par \@@par
-  \ifnum \outputpenalty<-\@M
-    \@specialoutput
+  \if@firstcolumn
+    \global\let\curr@nfbox@S@uc\curr@nfbox@S@ul
+    \global\let\curr@nfbox@S@lc\curr@nfbox@S@ll
+    \global\let\curr@nfbox@T@uc\curr@nfbox@T@ul
   \else
-    \@makecol
-    \@opcol
-    \@startcolumn
-    \@whilesw \if@fcolmade \fi
-      {%
-       \@opcol\@startcolumn}%
+    \global\let\curr@nfbox@S@uc\curr@nfbox@S@ur
+    \global\let\curr@nfbox@S@lc\curr@nfbox@S@lr
+    \global\let\curr@nfbox@T@uc\curr@nfbox@T@ur
   \fi
-  \ifnum \outputpenalty>-\@Miv
-    \ifdim \@colroom<1.5\baselineskip
-      \ifdim \@colroom<\textheight
-        \@latex@warning@no@line {Text page \thepage\space
-                               contains only floats}%
-        \@emptycol
-      \else
-        \global \vsize \@colroom
-      \fi
-    \else
-      \global \vsize \@colroom
-    \fi
+  \let \par \@@par
+  \global\@colht=\textheight
+  \ifdim\ht\curr@nfbox@B@ul>0.5\baselineskip
+    \global\advance\@colht by -\textheight
+  \fi
+  \ifdim\ht\curr@nfbox@W@ul>0.5\baselineskip
+    \global\advance\@colht by -0.5\textheight
+  \fi
+  \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
+    \global\advance\@colht by -0.5\textheight
+  \fi
+  \ifdim\@colht < \baselineskip
+    \nf@output@widepage
   \else
-    \global \vsize \maxdimen
+    \nf@makecol
   \fi
 }
+\def\nf@output@widepage{%
+  \if@firstcolumn\else
+  \ClassError{faosyb}{Wide or big nonfloats defined too late.  Move
+    them up}{I encountered Big or Wide floats when I already made the
+    first column.  Please move them up}
+  \fi
+  \ifdim\ht\curr@nfbox@B@ul>0.5\baselineskip
+     \global\setbox\@outputbox\vsplit\curr@nfbox@B@ul to \textheight
+  \else
+     \setbox\@tempboxa\vsplit\curr@nfbox@W@ul to \textheight
+     \setbox\@tempboxb\vsplit\curr@nfbox@W@ll to \textheight
+     \setbox\@outputbox\vbox\bgroup
+        \box\@tempboxa
+        \nointerlineskip
+        \box\@tempboxb
+     \egroup
+  \fi
+  \global\vsize\textheight
+  \global\@colht\textheight
+  \@outputpage
+}
+\def\nf@makecol{%
+  \global\@colroom\@colht
+  \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
+     \global\@colroom=0pt
+  \fi
+  \ifdim\ht\curr@nfbox@S@uc>0.5\baselineskip
+     \global\advance\@colroom by -0.5\textheight
+  \fi
+  \ifdim\ht\curr@nfbox@S@lc>0.5\baselineskip
+     \global\advance\@colroom by -0.5\textheight
+  \fi
+  \ifdim\@colroom<0.5\baselineskip
+    \nf@makenfcol
+  \else
+    \nf@makemixedcol
+  \fi}
+\def\nf@makefncol{%
+  \ifdim\@colht>0.9\textheight  % one tall or two squares
+    \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
+      \setbox\@outputbox
+      \vsplit \@curr@nfbox@T@uc to \textheight
+    \else
+     \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
+     \setbox\@tempboxb\vsplit\curr@nfbox@S@lc to 0.5\textheight
+     \setbox\@outputbox\vbox\bgroup
+        \box\@tempboxa
+        \nointerlineskip
+        \box\@tempboxb
+     \egroup
+    \fi
+  \else  % one square
+    \ifdim\ht\curr@nfbox@S@uc>0.49\textheight
+      \setbox\@outputbox\vsplit \curr@nfbox@S@uc to 0.5\textheight
+    \else
+      \setbox\@outputbox\vsplit \curr@nfbox@S@lc to 0.5\textheight
+    \fi
+  \fi
+  \nf@opcol}
+\def\nf@makemixedcol{%
+  \ifdim\@colroom=\vsize
+    \nf@makemixedcol@
+  \else
+    \global\vsize=\@colroom
+    \unvbox\@cclv
+  \fi}
+\def\nf@makemixedcol@{%
+   \ifvoid\footins
+     \setbox\@outputbox \box\@cclv
+   \else
+     \setbox\@outputbox \vbox {%
+       \boxmaxdepth \@maxdepth
+       \unvbox \@cclv
+       \vskip \skip\footins
+       \color@begingroup
+         \normalcolor
+         \footnoterule
+         \unvbox \footins
+       \color@endgroup
+       }%
+   \fi
+   \ifdim\ht\curr@nfbox@S@uc>0.49\textheight
+     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@uc
+     \setbox\@outputbox \vbox
+       \bgroup
+         \box\@tempboxa
+         \nointerlineskip
+         \box\@outputbox
+       \egroup
+   \fi
+   \ifdim\ht\curr@nfbox@S@lc>0.49\textheight
+     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@lc
+     \setbox\@outputbox \vbox
+       \bgroup
+         \box\@outputbox
+         \nointerlineskip
+         \box\@tempboxa
+       \egroup
+   \fi
+   \nf@opcol}
+\def\nf@opcol{%
+  \message{Starting nf@opcol}%
+  \if@firstcolumn
+    \global\@firstcolumnfalse
+    \global\setbox\@leftcolumn\box\@outputbox
+  \else
+    \global\@firstcolumntrue
+    \ifdim\ht\curr@nfbox@W@ul>0.5\baselineskip
+      \setbox\@outputbox\vsplit \curr@nfbox@W@ul to 0.5\textheight
+    \else
+      \setbox\@tempboxa\box\@outputbox
+    \fi
+    \setbox\@outputbox \vbox\bgroup
+      \box\@outputbox
+      \nointerlineskip
+      \hb@xt@\textwidth {%
+        \hb@xt@\columnwidth {%
+          \box\@leftcolumn \hss}%
+        \hfil
+        {\normalcolor\vrule \@width\columnseprule}%
+        \hfil
+        \hb@xt@\columnwidth {%
+          \box\@outputbox \hss}%
+      }%
+    \egroup
+    \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
+      \setbox\@tempboxa\vsplit \curr@nfbox@W@ll to 0.5\textheight
+      \setbox\@ouputbox\vbox\bgroup
+        \box\@outputpage
+        \nointerlineskip
+        \box\@tempboxa
+      \egroup
+    \fi
+    \global\vsize\textheight
+    \global\@colht\textheight
+    \@outputpage
+   \fi}
 \endinput
 %%
 %% End of file `faosyb.cls'.
