@@ -307,6 +307,9 @@
 \newbox\nfbox@W@LL
 \newbox\nfbox@B@ul
 \newbox\nfbox@B@UL
+\ifx\@tempboxb\@undefined
+  \newbox\@tempboxb
+\fi
 \edef\standard@output{\the\output}
 \output{\if@twocolumn\the\nf@output\else\standard@output\fi}
 \newtoks\nf@output
@@ -440,7 +443,7 @@
        }%
    \fi
    \ifdim\ht\curr@nfbox@S@uc>0.49\textheight
-     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@uc
+     \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
      \setbox\@outputbox \vbox
        \bgroup
          \box\@tempboxa
@@ -449,7 +452,7 @@
        \egroup
    \fi
    \ifdim\ht\curr@nfbox@S@lc>0.49\textheight
-     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@lc
+     \setbox\@tempboxa\vsplit\curr@nfbox@S@lc to 0.5\textheight
      \setbox\@outputbox \vbox
        \bgroup
          \box\@outputbox
@@ -459,19 +462,18 @@
    \fi
    \nf@opcol}
 \def\nf@opcol{%
-  \message{Starting nf@opcol}%
   \if@firstcolumn
     \global\@firstcolumnfalse
     \global\setbox\@leftcolumn\box\@outputbox
   \else
     \global\@firstcolumntrue
     \ifdim\ht\curr@nfbox@W@ul>0.5\baselineskip
-      \setbox\@outputbox\vsplit \curr@nfbox@W@ul to 0.5\textheight
+      \setbox\@tempboxa\vsplit \curr@nfbox@W@ul to 0.5\textheight
     \else
-      \setbox\@tempboxa\box\@outputbox
+      \setbox\@tempboxb\box\@tempboxa
     \fi
     \setbox\@outputbox \vbox\bgroup
-      \box\@outputbox
+      \box\@tempboxa
       \nointerlineskip
       \hb@xt@\textwidth {%
         \hb@xt@\columnwidth {%

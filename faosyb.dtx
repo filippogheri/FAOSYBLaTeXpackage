@@ -1314,6 +1314,16 @@
 \newbox\nfbox@B@UL
 %    \end{macrocode}
 % 
+% \begin{macro}{\@tempboxb}
+%   Standard \LaTeX\ has \cs{@tempboxa}.  We need more\dots
+%    \begin{macrocode}
+\ifx\@tempboxb\@undefined
+  \newbox\@tempboxb
+\fi
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 %
 % \begin{macro}{\standard@output}
 %   The standard \LaTeX\ output routine is saved as
@@ -1547,7 +1557,7 @@
        }%
    \fi
    \ifdim\ht\curr@nfbox@S@uc>0.49\textheight
-     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@uc
+     \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
      \setbox\@outputbox \vbox 
        \bgroup
          \box\@tempboxa
@@ -1556,7 +1566,7 @@
        \egroup
    \fi
    \ifdim\ht\curr@nfbox@S@lc>0.49\textheight
-     \setbox\@tempboxa\vsplit to 0.5\textheight\curr@nfbox@lc
+     \setbox\@tempboxa\vsplit\curr@nfbox@S@lc to 0.5\textheight
      \setbox\@outputbox \vbox 
        \bgroup
          \box\@outputbox
@@ -1575,19 +1585,18 @@
 %   treating of wide nonfloats.
 %    \begin{macrocode}
 \def\nf@opcol{%
-  \message{Starting nf@opcol}%
   \if@firstcolumn
     \global\@firstcolumnfalse
     \global\setbox\@leftcolumn\box\@outputbox
   \else
     \global\@firstcolumntrue
     \ifdim\ht\curr@nfbox@W@ul>0.5\baselineskip
-      \setbox\@outputbox\vsplit \curr@nfbox@W@ul to 0.5\textheight
+      \setbox\@tempboxa\vsplit \curr@nfbox@W@ul to 0.5\textheight
     \else
-      \setbox\@tempboxa\box\@outputbox
+      \setbox\@tempboxb\box\@tempboxa
     \fi
     \setbox\@outputbox \vbox\bgroup
-      \box\@outputbox
+      \box\@tempboxa
       \nointerlineskip
       \hb@xt@\textwidth {%
         \hb@xt@\columnwidth {%
