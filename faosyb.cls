@@ -200,10 +200,10 @@
   \nf@width=\columnwidth
   \nf@height=\dimexpr(\textheight/2-\nf@vert@sep)%
   \if\nf@vert@pos u\relax
-    \nf@topskip=\z@
+    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip)%
     \nf@bottomskip=\nf@vert@sep
   \else
-    \nf@topskip=\nf@vert@sep
+    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip+\nf@vert@sep)%
     \nf@bottomskip=\z@
   \fi
   \def\tempW{W}%
@@ -395,14 +395,16 @@
   \fi
   \ifdim\@colroom<0.5\baselineskip
     \nf@makenfcol
+    \unvbox\@cclv
   \else
     \nf@makemixedcol
   \fi}
-\def\nf@makefncol{%
+\def\nf@makenfcol{%
   \ifdim\@colht>0.9\textheight  % one tall or two squares
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
-      \setbox\@outputbox
+      \setbox\@outputbox\vbox\bgroup
       \vsplit \@curr@nfbox@T@uc to \textheight
+      \egroup
     \else
      \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
      \setbox\@tempboxb\vsplit\curr@nfbox@S@lc to 0.5\textheight
@@ -433,7 +435,7 @@
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
-       \unvbox \@cclv
+       \box \@cclv
        \vskip \skip\footins
        \color@begingroup
          \normalcolor
@@ -497,6 +499,46 @@
     \global\@colht\textheight
     \@outputpage
    \fi}
+\let\standard@clearpage\clearpage
+\def\clearpage{%
+  \if@twocolumn
+    \nf@clearpage
+  \else
+    \standard@clearpage
+\fi}
+\def\nf@totalheight{\dimexpr(%
+  \ht\nfbox@S@UL+
+  \ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+
+  \ht\nfbox@S@LR+
+  \ht\nfbox@T@UL+
+  \ht\nfbox@T@UR+
+  \ht\nfbox@W@UL+
+  \ht\nfbox@W@LL+
+  \ht\nfbox@B@UL+
+  \ht\nfbox@S@ul+
+  \ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+
+  \ht\nfbox@S@lr+
+  \ht\nfbox@T@ul+
+  \ht\nfbox@T@ur+
+  \ht\nfbox@W@ul+
+  \ht\nfbox@W@ll+
+  \ht\nfbox@B@ul)}
+\def\nf@clearpage{%
+  \newpage
+  \write\m@ne{}%
+  \loop
+    \vbox{}%
+    \penalty -\@Mi
+    \ifdim\nf@totalheight>\baselineskip\repeat}
+\def\clearspread{\clearpage
+    \if@twoside
+       \ifodd\c@page
+           \hbox{}\newpage
+           \if@twocolumn\hbox{}\newpage\fi
+    \fi\fi}
+\AtEndDocument{\clearpage}
 \endinput
 %%
 %% End of file `faosyb.cls'.

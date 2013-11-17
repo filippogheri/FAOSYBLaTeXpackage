@@ -1159,10 +1159,10 @@
   \nf@width=\columnwidth  
   \nf@height=\dimexpr(\textheight/2-\nf@vert@sep)%
   \if\nf@vert@pos u\relax
-    \nf@topskip=\z@
+    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip)%
     \nf@bottomskip=\nf@vert@sep
   \else
-    \nf@topskip=\nf@vert@sep
+    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip+\nf@vert@sep)%
     \nf@bottomskip=\z@
   \fi
   \def\tempW{W}%
@@ -1481,6 +1481,7 @@
 %    \begin{macrocode}
   \ifdim\@colroom<0.5\baselineskip
     \nf@makenfcol
+    \unvbox\@cclv
   \else
     \nf@makemixedcol
   \fi}
@@ -1494,11 +1495,12 @@
 %   called, we already know that the narrow non-floats would fill the
 %   column, so we do not do any additional checks.
 %    \begin{macrocode}
-\def\nf@makefncol{%
+\def\nf@makenfcol{%
   \ifdim\@colht>0.9\textheight  % one tall or two squares
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
-      \setbox\@outputbox 
-      \vsplit \@curr@nfbox@T@uc to \textheight 
+      \setbox\@outputbox\vbox\bgroup
+      \vsplit \@curr@nfbox@T@uc to \textheight
+      \egroup
     \else
      \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
      \setbox\@tempboxb\vsplit\curr@nfbox@S@lc to 0.5\textheight
@@ -1543,11 +1545,11 @@
 %    \begin{macrocode}
 \def\nf@makemixedcol@{%
    \ifvoid\footins
-     \setbox\@outputbox \box\@cclv
+     \setbox\@outputbox \box\@cclv 
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
-       \unvbox \@cclv
+       \box \@cclv
        \vskip \skip\footins
        \color@begingroup
          \normalcolor
@@ -1582,7 +1584,7 @@
 %
 % \begin{macro}{\nf@opcol}
 %   This is like the standard \LaTeX\ \cs{@outputdblcol}, but with the
-%   treating of wide nonfloats.
+%   treatment of wide nonfloats.
 %    \begin{macrocode}
 \def\nf@opcol{%
   \if@firstcolumn
@@ -1623,6 +1625,87 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+% \begin{macro}{\standard@clearpage}
+%   The usual \cs{clearpage} flushes the floats.  We keep it in
+%   \cs{standard@clearpage}
+%    \begin{macrocode}
+\let\standard@clearpage\clearpage
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+% \begin{macro}{\clearpage}
+%   Now we can define \cs{clearpage} to take care of the mode:
+%    \begin{macrocode}
+\def\clearpage{%
+  \if@twocolumn
+    \nf@clearpage
+  \else
+    \standard@clearpage
+\fi}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@totalheight}
+%   The total height of all non-floats
+%    \begin{macrocode}
+\def\nf@totalheight{\dimexpr(%
+  \ht\nfbox@S@UL+
+  \ht\nfbox@S@UR+
+  \ht\nfbox@S@LL+
+  \ht\nfbox@S@LR+
+  \ht\nfbox@T@UL+
+  \ht\nfbox@T@UR+
+  \ht\nfbox@W@UL+
+  \ht\nfbox@W@LL+
+  \ht\nfbox@B@UL+
+  \ht\nfbox@S@ul+
+  \ht\nfbox@S@ur+
+  \ht\nfbox@S@ll+
+  \ht\nfbox@S@lr+
+  \ht\nfbox@T@ul+
+  \ht\nfbox@T@ur+
+  \ht\nfbox@W@ul+
+  \ht\nfbox@W@ll+
+  \ht\nfbox@B@ul)}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\nf@clearpage}
+%   We keep ejecting pages until get rid of nf stuff
+%    \begin{macrocode}
+\def\nf@clearpage{%
+  \newpage
+  \write\m@ne{}%
+  \loop
+    \vbox{}%
+    \penalty -\@Mi
+    \ifdim\nf@totalheight>\baselineskip\repeat}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\clearspread}
+%   This is like \cs{cleardoublepage}, but with the logic inverted:
+%    \begin{macrocode}
+\def\clearspread{\clearpage
+    \if@twoside 
+       \ifodd\c@page
+           \hbox{}\newpage
+           \if@twocolumn\hbox{}\newpage\fi
+    \fi\fi}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% We need to clear everything at the end
+%    \begin{macrocode}
+\AtEndDocument{\clearpage}
+%    \end{macrocode}
+% 
 %
 %\Finale
 %\clearpage
