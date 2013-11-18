@@ -200,10 +200,10 @@
   \nf@width=\columnwidth
   \nf@height=\dimexpr(\textheight/2-\nf@vert@sep)%
   \if\nf@vert@pos u\relax
-    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip)%
+    \nf@topskip=\z@
     \nf@bottomskip=\nf@vert@sep
   \else
-    \nf@topskip=\dimexpr(\baselineskip+0.5\topskip+\nf@vert@sep)%
+    \nf@topskip=\nf@vert@sep%
     \nf@bottomskip=\z@
   \fi
   \def\tempW{W}%
@@ -285,7 +285,7 @@
     \edef\nf@currbox{\expandafter\csname nfbox@\nf@size
       @\nf@placement\endcsname}%
     \global\setbox\nf@currbox=
-    \vbox{\unvbox\nf@currbox\nointerlineskip\box\nf@mainbox}}
+    \vbox{\box\nf@currbox\nointerlineskip\penalty0\box\nf@mainbox}}
 \newnon@float{map}{lom}{Map}{List of Maps}
 \newnon@float{table}{lot}{Table}{List of Tables}
 \newnon@float{chart}{loc}{Chart}{List of Charts}
@@ -403,15 +403,23 @@
   \ifdim\@colht>0.9\textheight  % one tall or two squares
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
       \setbox\@outputbox\vbox\bgroup
+      \boxmaxdepth \@maxdepth
       \vsplit \@curr@nfbox@T@uc to \textheight
       \egroup
     \else
-     \setbox\@tempboxa\vsplit\curr@nfbox@S@uc to 0.5\textheight
-     \setbox\@tempboxb\vsplit\curr@nfbox@S@lc to 0.5\textheight
+     \setbox\@tempboxa\vbox\bgroup
+     \boxmaxdepth \@maxdepth
+     \vsplit\curr@nfbox@S@uc to 0.5\textheight
+     \egroup
+     \setbox\@tempboxb\vbox\bgroup
+     \boxmaxdepth \@maxdepth
+     \vsplit\curr@nfbox@S@lc to 0.5\textheight
+     \egroup
      \setbox\@outputbox\vbox\bgroup
-        \box\@tempboxa
+       \boxmaxdepth \@maxdepth
+        \unvbox\@tempboxa
         \nointerlineskip
-        \box\@tempboxb
+        \unvbox\@tempboxb
      \egroup
     \fi
   \else  % one square
@@ -495,9 +503,10 @@
         \box\@tempboxa
       \egroup
     \fi
+    \@outputpage
     \global\vsize\textheight
     \global\@colht\textheight
-    \@outputpage
+    \global\@colroom\textheight
    \fi}
 \let\standard@clearpage\clearpage
 \def\clearpage{%
@@ -526,18 +535,22 @@
   \ht\nfbox@W@ll+
   \ht\nfbox@B@ul)}
 \def\nf@clearpage{%
+  \ifvmode
+    \ifnum \@dbltopnum =\m@ne
+      \ifdim \pagetotal <\topskip
+        \hbox{}%
+      \fi
+    \fi
+  \fi
   \newpage
   \write\m@ne{}%
-  \loop
-    \vbox{}%
-    \penalty -\@Mi
-    \ifdim\nf@totalheight>\baselineskip\repeat}
-\def\clearspread{\clearpage
-    \if@twoside
-       \ifodd\c@page
-           \hbox{}\newpage
-           \if@twocolumn\hbox{}\newpage\fi
-    \fi\fi}
+  \vbox{}%
+  \penalty -\@Mi
+  \ifdim\nf@totalheight>\baselineskip
+  \null\vfill\clearpage\fi
+}
+\def\clearspread{\clearpage\if@twoside \ifodd\c@page
+    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
 \AtEndDocument{\clearpage}
 \endinput
 %%
