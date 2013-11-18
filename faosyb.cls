@@ -546,12 +546,17 @@
   \write\m@ne{}%
   \vbox{}%
   \penalty -\@Mi
+  \if@firstcolumn\else
+  \null\vfill\newpage\fi
   \ifdim\nf@totalheight>\baselineskip
   \null\vfill\clearpage\fi
 }
 \def\clearspread{\clearpage\if@twoside \ifodd\c@page
     \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
-\AtEndDocument{\clearpage}
+\AtEndDocument{\if@twocolumn
+  \ifdim\nf@totalheight>\baselineskip
+  \null\vfill\clearpage\fi
+\fi}
 \endinput
 %%
 %% End of file `faosyb.cls'.

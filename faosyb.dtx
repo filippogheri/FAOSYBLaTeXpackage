@@ -1698,6 +1698,8 @@
   \write\m@ne{}%
   \vbox{}%
   \penalty -\@Mi
+  \if@firstcolumn\else
+  \null\vfill\newpage\fi
   \ifdim\nf@totalheight>\baselineskip
   \null\vfill\clearpage\fi
 }
@@ -1716,7 +1718,10 @@
 %
 % We need to clear everything at the end
 %    \begin{macrocode}
-\AtEndDocument{\clearpage}
+\AtEndDocument{\if@twocolumn
+  \ifdim\nf@totalheight>\baselineskip
+  \null\vfill\clearpage\fi
+\fi}
 %    \end{macrocode}
 % 
 %
