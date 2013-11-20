@@ -647,6 +647,12 @@
 % \bibliographystyle{unsrt}}
 % \clearpage
 %
+%
+%\section{Implementation}
+%\label{sec:implementation}
+%
+%
+% 
 %\subsection{Options}
 %\label{sec:options}
 % 
@@ -1724,6 +1730,69 @@
 \fi}
 %    \end{macrocode}
 % 
+%
+%\subsection{Headers and Footers}
+%\label{sec:headers_footers}
+%
+% \begin{macro}{standarsdpagestyle}
+%   This is the page style for all pages.
+%    \begin{macrocode}
+\fancypagestyle{standardpagestyle}{%
+  fancyhf{}%
+}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+%\subsection{Sectioning}
+%\label{sec:sectioning}
+%
+% \begin{macro}{\if@mainmatter}
+%   This is used to check whether we are at main matter
+%    \begin{macrocode}
+\newif\if@mainmatter
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+% \begin{macro}{\frontmatter}
+%   We want Roman numbers for front matter:
+%    \begin{macrocode}
+\def\frontmatter{\cleardoublepage
+  \pagenumbering{roman}\onecolumn\@mainmatterfalse}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\mainmatter}
+%   We want Arabic numbers for main matter:
+%    \begin{macrocode}
+\def\mainmatter{\cleardoublepage\pagenumbering{arabic}\onecolumn
+  \pagestyle{standardpagestyle}%
+  \@mainmattertrue}
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+% \begin{macro}{\tocdepth}
+%   Only sections and up are allowed in TOC:
+%    \begin{macrocode}
+\setcounter{tocdepth}{1}
+%    \end{macrocode}   
+% \end{macro}
+% \begin{macro}{\secnumdepth}
+%   Only the parts are numbered in out setup:
+%    \begin{macrocode}
+\setcounter{secnumdepth}{-1}
+%    \end{macrocode}  
+% \end{macro}
+% \begin{macro}{\thepart}
+%   And the parts are numbered using Arabic numbers:
+%    \begin{macrocode}
+\renewcommand \thepart {\@arabic\c@part}
+%    \end{macrocode}
+% \end{macro}
+%
 %
 %\Finale
 %\clearpage

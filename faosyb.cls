@@ -557,6 +557,18 @@
   \ifdim\nf@totalheight>\baselineskip
   \null\vfill\clearpage\fi
 \fi}
+\fancypagestyle{standardpagestyle}{%
+  fancyhf{}%
+}
+\newif\if@mainmatter
+\def\frontmatter{\cleardoublepage
+  \pagenumbering{roman}\onecolumn\@mainmatterfalse}
+\def\mainmatter{\cleardoublepage\pagenumbering{arabic}\onecolumn
+  \pagestyle{standardpagestyle}%
+  \@mainmattertrue}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{-1}
+\renewcommand \thepart {\@arabic\c@part}
 \endinput
 %%
 %% End of file `faosyb.cls'.
