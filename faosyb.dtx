@@ -950,6 +950,110 @@
 % 
 % 
 %
+%\subsection{Setting Colors and Icons}
+%\label{sec:setting_colors_icons}
+%
+% \begin{macro}{\fao@color@string}
+%   This is the command that remembers the present color for TOC
+%    \begin{macrocode}
+\def\fao@color@string{0,0,0}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{@bgcolor@next}
+%   We store the next background color in |@bgcolor@next|.
+%  We store the next heading background in |@tableheadcolor@next|.
+% \begin{macro}{\setbgcolor}
+%   The command |\setbgcolor| selects the next background color:
+%    \begin{macrocode}
+\def\setbgcolor#1{\colorlet{@bgcolor@next}[cmyk]{#1}%
+  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{#1}}%
+  \gdef\fao@color@string{#1}}
+\setbgcolor{white}
+%    \end{macrocode}
+% \end{macro}   
+% \end{macro}
+%
+%  The key-value interface for the same command:
+%    \begin{macrocode}
+\define@key{fao}{bgcolor}{\setbgcolor{#1}}
+%    \end{macrocode}
+%  
+% And for separate setting of |@tableheadcolor|
+%    \begin{macrocode}
+\define@key{fao}{tableheadcolor}{\colorlet{@tableheadcolor}[cmyk]{#1}}
+%    \end{macrocode}
+%
+% \begin{macro}{@bgcolor}
+% The current color is in the macro |@bgcolor|.
+% \begin{macro}{@tableheadcolor}
+% \begin{macro}{\selectcolor}
+%   This command makes the actual color change:
+%    \begin{macrocode}
+\def\selectcolor{\colorlet{@bgcolor}{@bgcolor@next}%
+  \colorlet{@tableheadcolor}{@bgcolor!30}}
+\selectcolor
+%    \end{macrocode}
+%   
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{@tablebg}
+%   The color for table pages
+%    \begin{macrocode}
+\define@key{fao}{tablebg}{\colorlet{@tablebg}[cmyk]{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\seticon}
+%   Setting the next icon for the part
+%    \begin{macrocode}
+\def\seticon#1{\gdef\next@icon{#1}}
+\seticon{}
+\define@key{fao}{icon}{\seticon{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\selecticon}
+% \begin{macro}{\currenticon}
+%   The actual icon change
+%    \begin{macrocode}
+\def\selecticon{\gdef\currenticon{\next@icon}}
+\selecticon
+%    \end{macrocode}
+%   
+% \end{macro}
+% \end{macro}
+%
+%
+%\subsection{Page Styles}
+%\label{sec:pagestyles}
+%
+% \begin{macro}{standardpagestyle}
+%   This is our main page style
+%    \begin{macrocode}
+\fancypagestyle{standardpagestyle}{%
+  \fancyhf{}%
+  \fancyhfoffset[LR]{1cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyhead[LE]{\color{@bgcolor}\captionfamily
+    \Huge\ifnum\thepart>0\relax
+    \thepart\fi\normalsize\dotfill}%
+  \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
+    \Huge\leftmark
+    \ifx\currenticon\@empty\else\space
+  \raisebox{-0.25\totalheight}{%
+    \includegraphics[width=1.1cm]{\currenticon}}\fi}%
+}
+\pagestyle{standardpagestyle}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 %\subsection{Nonfloats}
 %\label{sec:floats}
 %

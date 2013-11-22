@@ -150,6 +150,35 @@
         \rotatebox{45}{%
           \fontsize{6cm}{6cm}\selectfont
           DRAFT}}}}\fi}
+\def\fao@color@string{0,0,0}
+\def\setbgcolor#1{\colorlet{@bgcolor@next}[cmyk]{#1}%
+  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{#1}}%
+  \gdef\fao@color@string{#1}}
+\setbgcolor{white}
+\define@key{fao}{bgcolor}{\setbgcolor{#1}}
+\define@key{fao}{tableheadcolor}{\colorlet{@tableheadcolor}[cmyk]{#1}}
+\def\selectcolor{\colorlet{@bgcolor}{@bgcolor@next}%
+  \colorlet{@tableheadcolor}{@bgcolor!30}}
+\selectcolor
+\define@key{fao}{tablebg}{\colorlet{@tablebg}[cmyk]{#1}}
+\def\seticon#1{\gdef\next@icon{#1}}
+\seticon{}
+\define@key{fao}{icon}{\seticon{#1}}
+\def\selecticon{\gdef\currenticon{\next@icon}}
+\selecticon
+\fancypagestyle{standardpagestyle}{%
+  \fancyhf{}%
+  \fancyhfoffset[LR]{1cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyhead[LE]{\color{@bgcolor}\captionfamily
+    \Huge\ifnum\thepart>0\relax
+    \thepart\fi\normalsize\dotfill}%
+  \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
+    \Huge\leftmark
+    \ifx\currenticon\@empty\else\space
+  \raisebox{-0.25\totalheight}{\includegraphics[width=1.1cm]{\currenticon}}\fi}%
+}
+\pagestyle{standardpagestyle}
 \newlength\nf@vert@sep
 \setlength\nf@vert@sep{30pt}
 \newlength\nf@width
