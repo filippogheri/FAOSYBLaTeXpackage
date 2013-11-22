@@ -370,8 +370,8 @@
   \ifdim\ht\curr@nfbox@B@ul>0.5\baselineskip
      \global\setbox\@outputbox\vsplit\curr@nfbox@B@ul to \textheight
   \else
-     \setbox\@tempboxa\vsplit\curr@nfbox@W@ul to \textheight
-     \setbox\@tempboxb\vsplit\curr@nfbox@W@ll to \textheight
+     \setbox\@tempboxa\vsplit\curr@nfbox@W@ul to 0.5\textheight
+     \setbox\@tempboxb\vsplit\curr@nfbox@W@ll to 0.5\textheight
      \setbox\@outputbox\vbox\bgroup
         \box\@tempboxa
         \nointerlineskip
