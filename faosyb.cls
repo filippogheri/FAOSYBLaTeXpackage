@@ -84,6 +84,8 @@
   /RegistryName(http://www.color.org)
  >> ]}
 \def\faoset#1{\setkeys{fao}{#1}}
+\define@key{fao}{year}{\gdef\fao@year{#1}}
+\faoset{year=20XX}
 \RequirePackage{arevmath}
 \def\PTSans@scale{0.95}
 \def\PTSansNarrow@scale{0.95}
@@ -115,11 +117,13 @@
    \belowdisplayskip \abovedisplayskip}
 \urlstyle{sf}
 \geometry{layout=a4paper,
-  left=2cm,right=2cm,bottom=2cm,top=2cm,twoside,
+  left=2cm,right=2cm,bottom=2.8cm,top=1.5cm,
   columnsep=30pt, twoside}%
 \savegeometry{standard}
 \setlength\parindent\z@
 \setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
+\setlength\footskip{18\p@}
+\setlength\headheight{35\p@}
 \AtBeginDocument{\ifprint
   \AtBeginShipout{%
     \AtBeginShipoutUpperLeftForeground{%
@@ -162,23 +166,65 @@
 \selectcolor
 \define@key{fao}{tablebg}{\colorlet{@tablebg}[cmyk]{#1}}
 \def\seticon#1{\gdef\next@icon{#1}}
-\seticon{}
 \define@key{fao}{icon}{\seticon{#1}}
 \def\selecticon{\gdef\currenticon{\next@icon}}
-\selecticon
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
-  \fancyhfoffset[LR]{1cm}%
+  \fancyhfoffset[LR]{1.8cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyhead[LE]{\color{@bgcolor}\captionfamily
     \Huge\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
   \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
     \Huge\leftmark
-    \ifx\currenticon\@empty\else\space
-  \raisebox{-0.25\totalheight}{\includegraphics[width=1.1cm]{\currenticon}}\fi}%
+    \ifx\currenticon\@undefined\else\space
+  \raisebox{-0.25\totalheight}{%
+    \includegraphics[width=1.1cm]{\currenticon}}\fi}%
+  \fancyfoot[LE]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+  \egroup}%
+  \fancyfoot[LO]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\rightmark}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+  \egroup}%
 }
 \pagestyle{standardpagestyle}
+\fancypagestyle{partpagestyle}{%
+  \fancyhf{}%
+  \fancyhead[L]{%
+    \begin{picture}(0,0)
+      \put(-14,45){\color{@bgcolor!10}%
+        \raisebox{-\height}{%
+          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.5cm)}}}
+    \end{picture}}
+  \fancyhfoffset[LR]{1.8cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyfoot[LE]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+  \egroup}%
+  \fancyfoot[LO]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\rightmark}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+  \egroup}%
+}
 \newlength\nf@vert@sep
 \setlength\nf@vert@sep{30pt}
 \newlength\nf@width
@@ -436,19 +482,11 @@
       \vsplit \@curr@nfbox@T@uc to \textheight
       \egroup
     \else
-     \setbox\@tempboxa\vbox\bgroup
-     \boxmaxdepth \@maxdepth
-     \vsplit\curr@nfbox@S@uc to 0.5\textheight
-     \egroup
-     \setbox\@tempboxb\vbox\bgroup
-     \boxmaxdepth \@maxdepth
-     \vsplit\curr@nfbox@S@lc to 0.5\textheight
-     \egroup
      \setbox\@outputbox\vbox\bgroup
-       \boxmaxdepth \@maxdepth
-        \unvbox\@tempboxa
-        \nointerlineskip
-        \unvbox\@tempboxb
+      \boxmaxdepth \@maxdepth
+      \vsplit\curr@nfbox@S@uc to 0.5\textheight
+       \nointerlineskip
+       \vsplit\curr@nfbox@S@lc to 0.5\textheight
      \egroup
     \fi
   \else  % one square
@@ -472,7 +510,7 @@
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
-       \box \@cclv
+       \unvbox \@cclv
        \vskip \skip\footins
        \color@begingroup
          \normalcolor
@@ -586,9 +624,6 @@
   \ifdim\nf@totalheight>\baselineskip
   \null\vfill\clearpage\fi
 \fi}
-\fancypagestyle{standardpagestyle}{%
-  fancyhf{}%
-}
 \newif\if@mainmatter
 \def\frontmatter{\cleardoublepage
   \pagenumbering{roman}\onecolumn\@mainmatterfalse}
@@ -598,6 +633,48 @@
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{-1}
 \renewcommand \thepart {\@arabic\c@part}
+\newcounter{fao@partnum}
+\setcounter{fao@partnum}{0}
+\def\fao@currentpartnum{0}
+\renewcommand\part{%
+  \clearspread
+  \selectcolor
+  \selecticon
+  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{\fao@color@string}}%
+  \stepcounter{fao@partnum}%
+  \addtocontents{toc}{%
+    \string\gdef\string\fao@currentpartnum{\thefao@partnum}}%
+  \rowcolors{2}{@bgcolor!10}{}%
+  \pagestyle{partpagestyle}%
+  \if@twocolumn
+    \onecolumn
+  \fi
+  \cleardoublepage\bgroup\color{@bgcolor}%
+  \secdef\@part\@spart}
+\def\EndPartIntro{\egroup
+  \clearspread\twocolumn
+  \pagestyle{standardpagestyle}}
+\def\iconfill#1#2{%
+  \@tempdima=#1
+  \@tempcnta=#2
+  \hfill
+  \loop
+  \includegraphics[width=\@tempdima]{\currenticon}%
+  \@tempdima=1.44\@tempdima
+  \advance\@tempcnta by -1
+  \ifnum\@tempcnta>0\repeat\hfill}
+\def\@part[#1]#2{%
+      \refstepcounter{part}%
+      \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+    \markboth{#1}{#1}%
+    {\interlinepenalty \@M
+      \iconfill{.7cm}{7}\par
+      \captionfamily
+      \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
+      \parbox[b]{0.8\textwidth}{\fontsize{86\p@}{86\p@}\selectfont
+        \raggedright#2}\par\vskip120\p@
+    }\par}
+\def\sectionmark#1{\markright{#1}}
 \endinput
 %%
 %% End of file `faosyb.cls'.

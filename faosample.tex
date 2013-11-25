@@ -1,17 +1,23 @@
-%\tracingmacros=1
 \documentclass[print,Draft]{faosyb}
 \usepackage{lipsum}
+\faoset{year=2013}
 \begin{document}
-\faoset{bgcolor=blue,icon=icons/settings}
 
-\selectcolor
-\selecticon
+
+
+
 
 \mainmatter
+\faoset{bgcolor=blue,icon=icons/settings}
 \part{The Setting}
 \markboth{The Setting}{The Setting}
 \lipsum
-\twocolumn
+\EndPartIntro
+
+\section{The First Section}
+\label{sec:first}
+
+
 
 \begin{chart}{S}{UL}
 \caption{Incarceration ratest acroos countries}
@@ -42,7 +48,6 @@
 \includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
 \source{Wikipedia}
 \end{chart}
-\textcolor{red}{a}\footnote{b\\c\\d}
 \lipsum[5-12]
 \clearspread
 

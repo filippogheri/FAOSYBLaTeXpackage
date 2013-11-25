@@ -169,6 +169,8 @@
 % Note that at this time there is no
 % similar facility for the |\input| command.  
 %
+% 
+%
 %\subsection{Setting Parameters}
 %\label{sec:ug_faoset}
 %
@@ -181,6 +183,15 @@
 % 
 %
 %  Most of the parameters are explained below.
+%
+%  One of the important parameters is |year|.  While the package at
+%  this time does not provide facilities for the title pages, it needs
+%  to know the year for the proper typesetting of footers.  The
+%  command
+% \begin{verbatim}
+% \faoset{year=2013}
+% \end{verbatim}
+%  is used to provide this information.  
 %
 %\subsection{Fonts}
 %\label{sec:ug_fonts}
@@ -791,6 +802,13 @@
 %   
 % \end{macro}
 %
+% One of the important keys is |year|
+%    \begin{macrocode}
+\define@key{fao}{year}{\gdef\fao@year{#1}}
+\faoset{year=20XX}
+%    \end{macrocode}
+% 
+%
 %\subsection{Fonts}
 %\label{sec:fonts}
 %
@@ -880,7 +898,7 @@
 %  We use a4paper.  
 %    \begin{macrocode}
 \geometry{layout=a4paper,
-  left=2cm,right=2cm,bottom=2cm,top=2cm,twoside,
+  left=2cm,right=2cm,bottom=2.8cm,top=1.5cm,
   columnsep=30pt, twoside}%
 \savegeometry{standard}
 %    \end{macrocode}
@@ -895,6 +913,21 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\footskip}
+%   We need generous foot
+%    \begin{macrocode}
+\setlength\footskip{18\p@}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\headheight}
+%   We need generous headers
+%    \begin{macrocode}
+\setlength\headheight{35\p@}
+%    \end{macrocode}
+%   
 % \end{macro}
 %
 %
@@ -1012,7 +1045,6 @@
 %   Setting the next icon for the part
 %    \begin{macrocode}
 \def\seticon#1{\gdef\next@icon{#1}}
-\seticon{}
 \define@key{fao}{icon}{\seticon{#1}}
 %    \end{macrocode}
 %   
@@ -1023,7 +1055,6 @@
 %   The actual icon change
 %    \begin{macrocode}
 \def\selecticon{\gdef\currenticon{\next@icon}}
-\selecticon
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1038,18 +1069,68 @@
 %    \begin{macrocode}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
-  \fancyhfoffset[LR]{1cm}%
+  \fancyhfoffset[LR]{1.8cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyhead[LE]{\color{@bgcolor}\captionfamily
     \Huge\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
   \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
     \Huge\leftmark
-    \ifx\currenticon\@empty\else\space
+    \ifx\currenticon\@undefined\else\space
   \raisebox{-0.25\totalheight}{%
     \includegraphics[width=1.1cm]{\currenticon}}\fi}%
+  \fancyfoot[LE]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+  \egroup}%
+  \fancyfoot[LO]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\rightmark}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+  \egroup}%
 }
 \pagestyle{standardpagestyle}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{partpagestyle}
+%   The page style for the parts introduction
+%    \begin{macrocode}
+\fancypagestyle{partpagestyle}{%
+  \fancyhf{}%
+  \fancyhead[L]{%
+    \begin{picture}(0,0)
+      \put(-14,45){\color{@bgcolor!10}%
+        \raisebox{-\height}{%
+          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.5cm)}}}
+    \end{picture}}
+  \fancyhfoffset[LR]{1.8cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyfoot[LE]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+  \egroup}%
+  \fancyfoot[LO]{
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \color{@bgcolor}%
+    \raisebox{-\height}{\rightmark}%
+    \normalsize\dotfill
+    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+  \egroup}%
+}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1613,19 +1694,11 @@
       \vsplit \@curr@nfbox@T@uc to \textheight
       \egroup
     \else
-     \setbox\@tempboxa\vbox\bgroup
-     \boxmaxdepth \@maxdepth
-     \vsplit\curr@nfbox@S@uc to 0.5\textheight
-     \egroup
-     \setbox\@tempboxb\vbox\bgroup
-     \boxmaxdepth \@maxdepth
-     \vsplit\curr@nfbox@S@lc to 0.5\textheight
-     \egroup
      \setbox\@outputbox\vbox\bgroup
-       \boxmaxdepth \@maxdepth
-        \unvbox\@tempboxa
-        \nointerlineskip
-        \unvbox\@tempboxb
+      \boxmaxdepth \@maxdepth
+      \vsplit\curr@nfbox@S@uc to 0.5\textheight
+       \nointerlineskip
+       \vsplit\curr@nfbox@S@lc to 0.5\textheight
      \egroup
     \fi
   \else  % one square
@@ -1667,7 +1740,7 @@
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
-       \box \@cclv
+       \unvbox \@cclv
        \vskip \skip\footins
        \color@begingroup
          \normalcolor
@@ -1835,19 +1908,6 @@
 %    \end{macrocode}
 % 
 %
-%\subsection{Headers and Footers}
-%\label{sec:headers_footers}
-%
-% \begin{macro}{standarsdpagestyle}
-%   This is the page style for all pages.
-%    \begin{macrocode}
-\fancypagestyle{standardpagestyle}{%
-  fancyhf{}%
-}
-%    \end{macrocode}
-%   
-% \end{macro}
-%
 %
 %\subsection{Sectioning}
 %\label{sec:sectioning}
@@ -1897,6 +1957,97 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\c@fao@partnum}
+%   To draw the blobs in part color in the proper position, we need to
+%   associate them with parts.   However, some parts are numbered,
+%   some are not.  The macro |\fao@partnum| keeps the current part
+%   number counted continuously from the beginning to end.
+%    \begin{macrocode}
+\newcounter{fao@partnum}
+\setcounter{fao@partnum}{0}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\fao@currentpartnum}
+%   The current value of |\fao@partnum| used in TOC:
+%    \begin{macrocode}
+\def\fao@currentpartnum{0}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\part}
+%  The largest partition in the book
+%    \begin{macrocode}
+\renewcommand\part{%
+  \clearspread
+  \selectcolor
+  \selecticon
+  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{\fao@color@string}}%
+  \stepcounter{fao@partnum}%
+  \addtocontents{toc}{%
+    \string\gdef\string\fao@currentpartnum{\thefao@partnum}}%
+  \rowcolors{2}{@bgcolor!10}{}%
+  \pagestyle{partpagestyle}%
+  \if@twocolumn
+    \onecolumn
+  \fi
+  \cleardoublepage\bgroup\color{@bgcolor}%
+  \secdef\@part\@spart}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\EndPartIntro}
+%   This command switches off the  special formatting of part pages:
+%    \begin{macrocode}
+\def\EndPartIntro{\egroup
+  \clearspread\twocolumn
+  \pagestyle{standardpagestyle}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{iconfill}
+%   Fill a line with the current icon of increasing size.  The
+%   parameters are the initial size and number of repetitions
+%    \begin{macrocode}
+\def\iconfill#1#2{%
+  \@tempdima=#1
+  \@tempcnta=#2
+  \hfill
+  \loop
+  \includegraphics[width=\@tempdima]{\currenticon}%
+  \@tempdima=1.44\@tempdima
+  \advance\@tempcnta by -1
+  \ifnum\@tempcnta>0\repeat\hfill}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\@part}
+%   This is the actual part making macro.
+%    \begin{macrocode}
+\def\@part[#1]#2{%
+      \refstepcounter{part}%
+      \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+    \markboth{#1}{#1}%
+    {\interlinepenalty \@M
+      \iconfill{.7cm}{7}\par
+      \captionfamily
+      \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
+      \parbox[b]{0.8\textwidth}{\fontsize{86\p@}{86\p@}\selectfont
+        \raggedright#2}\par\vskip120\p@
+    }\par}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\sectionmark}
+%   We do not want to have uppercase sections in the footers
+%    \begin{macrocode}
+\def\sectionmark#1{\markright{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
 %
 %\Finale
 %\clearpage
