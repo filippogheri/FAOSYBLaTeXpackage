@@ -58,6 +58,7 @@
 \end{document}
 %    \end{macrocode}
 %</gobble> 
+%<*class>
 % \fi
 % \MakeShortVerb{|}
 % \GetFileInfo{faosyb.dtx}
@@ -661,7 +662,6 @@
 %
 %\section{Implementation}
 %\label{sec:implementation}
-%
 %
 % 
 %\subsection{Options}
@@ -2048,6 +2048,62 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+%
+%\subsection{Tables}
+%\label{sec:tables}
+%
+% We define new column types for table headers:
+%    \begin{macrocode}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcolumntype{H}{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]}c}
+%    \end{macrocode}
+% 
+% |P| columntype is much more complex.  Basically we want a centered
+% entry with a parbox of the given width inside.:
+%    \begin{macrocode}
+\newcolumntype{P}[1]{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]%
+    \@fao@Pentry{#1}}c<{\end@fao@Pentry}}
+%    \end{macrocode}
+% \begin{macro}{\@fao@Pentry}
+%   Since |\parbox| needs ``real'' braces to delimit the argument, 
+%   we use this trick.  Note |\hspace{0pt}| to allow \TeX{} to
+%   hyphenate the first word. 
+%    \begin{macrocode}
+\def\@fao@Pentry#1#2\end@fao@Pentry{%
+\parbox[t]{#1}{\centering\strut\hspace{\z@}#2\strut}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% Same with |C| entry:
+%    \begin{macrocode}
+\newcolumntype{C}[1]{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]%
+    \@fao@Centry{#1}}c<{\end@fao@Centry}}
+%    \end{macrocode}
+% \begin{macro}{\@fao@Centry}
+%   This macro is similar to |\@fao@Pentry|, but with different
+%   way to set the width of the |\parbox|:
+%    \begin{macrocode}
+\def\@fao@Centry#1#2\end@fao@Centry{%
+\settowidth{\@tempdima}{$-99.999$}%
+\@tempdima=#1\@tempdima\relax
+\parbox[t]{\@tempdima}{\centering\strut\hspace{\z@}#2\strut}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% 
+% 
+% \subsection{The final word}
+%\label{sec:final}
+%
+%    \begin{macrocode}
+\normalsize\normalfont
+%</class>      
+%    \end{macrocode}
+%   
+%
 %
 %\Finale
 %\clearpage

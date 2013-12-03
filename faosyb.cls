@@ -675,6 +675,19 @@
         \raggedright#2}\par\vskip120\p@
     }\par}
 \def\sectionmark#1{\markright{#1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcolumntype{H}{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]}c}
+\newcolumntype{P}[1]{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]%
+    \@fao@Pentry{#1}}c<{\end@fao@Pentry}}
+\def\@fao@Pentry#1#2\end@fao@Pentry{%
+\parbox[t]{#1}{\centering\strut\hspace{\z@}#2\strut}}
+\newcolumntype{C}[1]{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]%
+    \@fao@Centry{#1}}c<{\end@fao@Centry}}
+\def\@fao@Centry#1#2\end@fao@Centry{%
+\settowidth{\@tempdima}{$-99.999$}%
+\@tempdima=#1\@tempdima\relax
+\parbox[t]{\@tempdima}{\centering\strut\hspace{\z@}#2\strut}}
+\normalsize\normalfont
 \endinput
 %%
 %% End of file `faosyb.cls'.
