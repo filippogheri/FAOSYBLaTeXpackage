@@ -217,7 +217,8 @@
 %  \rowcolors{4}{@bgcolor!30}{@bgcolor!20}
 %  \input{./Tables/P1.DEM_1.tex}}
 % \end{verbatim}
-%  
+%  The choice of \cs{narrowfamily} is automatically done by the
+%  |tablepages| environment.
 %
 %\subsection{Colors and Icons for Parts}
 %\label{sec:ug_color_icons}
@@ -238,7 +239,7 @@
 %
 % The key |tableheadcolor| sets the color for the headers of tables defined
 % by |H| or |P| key (see Section~\ref{sec:ug_floats}).  Normally it is
-% 30\% of the current |@bgcolor| color, but it can be set to any required
+% the current |@bgcolor| color, but it can be set to any required
 % value. 
 %
 % \DescribeMacro{\selecticon}\DescribeMacro{\selectcolor}
@@ -440,6 +441,12 @@
 %\subsection{Tables}
 %\label{sec:ug_tables}
 %
+% \DescribeEnv{tablepages}
+% The tables at the end of a part should be typeset inside
+% |tablepages| environment.  The environment switches to the one
+% column setup, decreases the margins and changes the font to
+% \cs{narrowfamily}.  
+%
 % To typeset numericall items one should use |d| column identifier
 % with the format |d|\marg{a.b}, where $a$ is the number of decimal
 % in the integer part of the number, and $b$ is the number of decimal
@@ -485,6 +492,18 @@
 % argument means an interruption of the line. The interruption is by
 % defalut a black interval, to make it the same color as the header
 % background, use \verb+>{\arrayrulecolor{@tableheadcolor}}|+. 
+%
+% The design of the tables in the current edition requires several
+% important changes to the usual tables:
+% \begin{enumerate}
+% \item There should be no \cs{toprule} at the beginning of a table.
+% \item The first row header of a table must be empty and white; this
+%   is done by the command |\cellcolor{white} in this cell.
+% \item \cs{hhline} separating rows in the header must not go through
+% this first white cell;  this is done by the |~| specificaton.
+% \end{enumerate}
+% 
+%
 %
 %\subsection{Publication Descriptions}
 %\label{sec:ug_publications}
@@ -741,6 +760,7 @@
 \RequirePackage[authoryear]{natbib}
 \RequirePackage[breaklinks]{hyperref}
 \RequirePackage{bookmark}
+\RequirePackage{adjmulticol}
 \if@issuumode
 \RequirePackage{issuulinks}
 \fi
@@ -1025,7 +1045,7 @@
 %   This command makes the actual color change:
 %    \begin{macrocode}
 \def\selectcolor{\colorlet{@bgcolor}{@bgcolor@next}%
-  \colorlet{@tableheadcolor}{@bgcolor!30}}
+  \colorlet{@tableheadcolor}{@bgcolor}}
 \selectcolor
 %    \end{macrocode}
 %   
@@ -2053,6 +2073,27 @@
 %\subsection{Tables}
 %\label{sec:tables}
 %
+% \begin{macro}{\tablepages}
+%   Long tables at the end of a part
+%    \begin{macrocode}
+\newenvironment{tablepages}{\clearspread\if@twocolumn\onecolumn
+  \bgroup\narrowfamily
+  \def\emph{\textsl}%
+  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%
+  {\end{adjmulticols}\egroup}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\tablemph}
+%   Some styles define \cs{tablemph} commands.  Here we supply a stub
+%    \begin{macrocode}
+\AtBeginDocument{\providecommand{\tablemph}[1]{\emph{#1}}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
 % We define new column types for table headers:
 %    \begin{macrocode}
 \newcolumntype{d}[1]{D{.}{.}{#1}}
@@ -2093,7 +2134,26 @@
 %   
 % \end{macro}
 %
-% 
+% \begin{macro}{\LT@makecaption}
+%   This macro produces the caption for the long tables.  We redefine
+%   it to get the tables in the way specified by the designer
+%    \begin{macrocode}
+\def\LT@makecaption#1#2#3{%
+  \LT@mcol\LT@cols {@{}l}{\cellcolor{white}%
+    \rlap{\fcolorbox{white}{@tableheadcolor}{\normalsize
+      \captionfamily\large\strut
+      \textcolor{white}{#1{\MakeUppercase{#2}: }#3}}}%
+    \begin{picture}(0,0)%
+      \put(.5,-7){\color{@bgcolor}%
+        \begin{tikzpicture}[baseline=(current bounding box.north)]
+          \fill (0,0) -- (\nf@trianglebase,0) -- 
+          (.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
+        \end{tikzpicture}}
+    \end{picture}%
+    \raisebox{-17pt}{\strut}}}
+%    \end{macrocode}
+%   
+% \end{macro}
 % 
 % \subsection{The final word}
 %\label{sec:final}

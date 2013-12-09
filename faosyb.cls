@@ -48,6 +48,7 @@
 \RequirePackage[authoryear]{natbib}
 \RequirePackage[breaklinks]{hyperref}
 \RequirePackage{bookmark}
+\RequirePackage{adjmulticol}
 \if@issuumode
 \RequirePackage{issuulinks}
 \fi
@@ -162,7 +163,7 @@
 \define@key{fao}{bgcolor}{\setbgcolor{#1}}
 \define@key{fao}{tableheadcolor}{\colorlet{@tableheadcolor}[cmyk]{#1}}
 \def\selectcolor{\colorlet{@bgcolor}{@bgcolor@next}%
-  \colorlet{@tableheadcolor}{@bgcolor!30}}
+  \colorlet{@tableheadcolor}{@bgcolor}}
 \selectcolor
 \define@key{fao}{tablebg}{\colorlet{@tablebg}[cmyk]{#1}}
 \def\seticon#1{\gdef\next@icon{#1}}
@@ -675,6 +676,12 @@
         \raggedright#2}\par\vskip120\p@
     }\par}
 \def\sectionmark#1{\markright{#1}}
+\newenvironment{tablepages}{\clearspread\if@twocolumn\onecolumn
+  \bgroup\narrowfamily
+  \def\emph{\textsl}%
+  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%
+  {\end{adjmulticols}\egroup}
+\AtBeginDocument{\providecommand{\tablemph}[1]{\emph{#1}}}
 \newcolumntype{d}[1]{D{.}{.}{#1}}
 \newcolumntype{H}{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]}c}
 \newcolumntype{P}[1]{>{\columncolor{@tableheadcolor}[1.01\tabcolsep][1.01\tabcolsep]%
@@ -687,6 +694,19 @@
 \settowidth{\@tempdima}{$-99.999$}%
 \@tempdima=#1\@tempdima\relax
 \parbox[t]{\@tempdima}{\centering\strut\hspace{\z@}#2\strut}}
+\def\LT@makecaption#1#2#3{%
+  \LT@mcol\LT@cols {@{}l}{\cellcolor{white}%
+    \rlap{\fcolorbox{white}{@tableheadcolor}{\normalsize
+      \captionfamily\large\strut
+      \textcolor{white}{#1{\MakeUppercase{#2}: }#3}}}%
+    \begin{picture}(0,0)%
+      \put(.5,-7){\color{@bgcolor}%
+        \begin{tikzpicture}[baseline=(current bounding box.north)]
+          \fill (0,0) -- (\nf@trianglebase,0) --
+          (.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
+        \end{tikzpicture}}
+    \end{picture}%
+    \raisebox{-17pt}{\strut}}}
 \normalsize\normalfont
 \endinput
 %%
