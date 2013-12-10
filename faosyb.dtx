@@ -37,7 +37,7 @@
 \ProvidesFile{faosyb.dtx}
 %</gobble>
 %<class>\ProvidesClass{faosyb}
-[2013/08/18 v0.1 Typesetting FAO Yearbook]
+[2013/12/10 v0.2 Typesetting FAO Yearbook]
 %<*gobble>
 %    \end{macrocode}
 %
@@ -1130,7 +1130,7 @@
     \begin{picture}(0,0)
       \put(-14,45){\color{@bgcolor!10}%
         \raisebox{-\height}{%
-          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.5cm)}}}
+          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.8cm)}}}
     \end{picture}}
   \fancyhfoffset[LR]{1.8cm}%
   \renewcommand\headrulewidth{\z@}%
@@ -1711,7 +1711,7 @@
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
       \setbox\@outputbox\vbox\bgroup
       \boxmaxdepth \@maxdepth
-      \vsplit \@curr@nfbox@T@uc to \textheight
+      \vsplit \curr@nfbox@T@uc to \textheight
       \egroup
     \else
      \setbox\@outputbox\vbox\bgroup
@@ -2018,10 +2018,11 @@
 % \end{macro}
 %
 % \begin{macro}{\EndPartIntro}
+% \changes{v0.2}{2013/12/10}{Deleted \cs{clearspread}}
 %   This command switches off the  special formatting of part pages:
 %    \begin{macrocode}
 \def\EndPartIntro{\egroup
-  \clearspread\twocolumn
+  \twocolumn
   \pagestyle{standardpagestyle}}
 %    \end{macrocode}
 %   
@@ -2045,6 +2046,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@part}
+% \changes{v0.2}{2013/12/03}{Changed formatting}
 %   This is the actual part making macro.
 %    \begin{macrocode}
 \def\@part[#1]#2{%
@@ -2055,8 +2057,8 @@
       \iconfill{.7cm}{7}\par
       \captionfamily
       \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
-      \parbox[b]{0.8\textwidth}{\fontsize{86\p@}{86\p@}\selectfont
-        \raggedright#2}\par\vskip120\p@
+      \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+        \raggedright\null#2\par}\par\vskip120\p@
     }\par}
 %    \end{macrocode}
 % \end{macro}
@@ -2069,6 +2071,19 @@
 %   
 % \end{macro}
 %
+% \begin{macro}{\section}
+% \changes{v0.2}{2013/12/10}{Redefined}
+%   New sections start on a recto page in one column mode and on a
+%   verso page in two column mode
+%    \begin{macrocode}
+\renewcommand\section{\if@twocolumn\clearspread\else\cleardoublepage\fi
+  \@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\Large\bfseries}}
+%    \end{macrocode}
+%   
+% \end{macro}
 %
 %\subsection{Tables}
 %\label{sec:tables}

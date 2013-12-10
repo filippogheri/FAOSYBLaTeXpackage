@@ -3,52 +3,100 @@
 \faoset{year=2013}
 \begin{document}
 
-
-
-
+\addtocounter{page}{1}  % To make odd pages even and even pages odd
 
 \mainmatter
 \faoset{bgcolor=blue,icon=icons/settings}
-\part{The Setting}
-\markboth{The Setting}{The Setting}
+\part[The Setting]{The\\ Setting}
 \lipsum
 \EndPartIntro
 
-\section{The First Section}
+\section{Overview}
 \label{sec:first}
 
-
-
-\begin{chart}{S}{UL}
-\caption{Incarceration ratest acroos countries}
-\label{chart:incarceration}
-\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
-\source{Wikipedia}
-\end{chart}
-
-\begin{map}{W}{ul}
+\begin{map}{S}{ur}
 \caption{Ancient Roma \newline (Trajan times)}
 \label{map:roma}
 \includegraphics[width=\chartwidth,height=\chartheight]{Rome}
 \source{Wikipedia}
 \end{map}
 
-\lipsum[1-15]
+\begin{map}{S}{lr}
+\caption{Ancient Roma \newline (Trajan times)}
+\label{map:roma}
+\includegraphics[width=\chartwidth,height=\chartheight]{Rome}
+\source{Wikipedia}
+\end{map}
 
-\begin{chart}{S}{ul}
+\begin{map}{S}{ll}
+\caption{Ancient Roma \newline (Trajan times)}
+\label{map:roma}
+\includegraphics[width=\chartwidth,height=\chartheight]{Rome}
+\source{Wikipedia}
+\end{map}
+
+
+\begin{map}{W}{UL}
+\caption{Ancient Roma \newline (Trajan times)}
+\label{map:roma}
+\includegraphics[width=\chartwidth,height=\chartheight]{Rome}
+\source{Wikipedia}
+\end{map}
+
+\begin{chart}{S}{LL}
 \caption{Incarceration ratest across countries}
 \label{chart:incarceration}
 \includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
 \source{Wikipedia}
 \end{chart}
 
-\begin{chart}{S}{ll}
-\caption{Incarceration ratest acroos countries: First ll chart}
+\begin{chart}{S}{LR}
+\caption{Incarceration ratest across countries}
 \label{chart:incarceration}
 \includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
 \source{Wikipedia}
 \end{chart}
-\lipsum[5-12]
+
+\lipsum[1-9]
+
+
+\section{Economy}
+
+\lipsum[1-4]
+
+
+\begin{chart}{S}{ur}
+\caption{Incarceration ratest across countries}
+\label{chart:incarceration}
+\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
+\source{Wikipedia}
+\end{chart}
+
+\begin{chart}{S}{lr}
+\caption{Incarceration ratest across countries}
+\label{chart:incarceration}
+\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
+\source{Wikipedia}
+\end{chart}
+
+\begin{chart}{B}{UL}
+\caption{Incarceration ratest across countries}
+\label{chart:incarceration}
+\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
+\source{Wikipedia}
+\end{chart}
+
+\clearspread
+\section{Land and Water}
+
+\lipsum[1-4]
+
+\begin{chart}{T}{UR}
+\caption{Incarceration ratest across countries}
+\label{chart:incarceration}
+\includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
+\source{Wikipedia}
+\end{chart}
 
 \begin{tablepages}
 \small
@@ -60,6 +108,28 @@
 \clearpage
 \input{T_P4.IOA.1}
 \end{tablepages}
+
+
+\faoset{bgcolor=orange,icon=icons/settings}
+\part{Hunger Dimensions}
+\lipsum
+\EndPartIntro
+
+\begin{tablepages}
+\small
+\input{T_P1.CAP.1}  
+
+\end{tablepages}
+
+\faoset{bgcolor=red!70!blue,icon=icons/settings}
+\part[Feeding the world]{Feeding\\ the world}
+\lipsum
+\EndPartIntro
+
+\faoset{bgcolor=green!75!blue,icon=icons/settings}
+\part[Sustainability dimensions]{Sustain\-ability dimensions}
+\lipsum
+\EndPartIntro
 
 \end{document}
 

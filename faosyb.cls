@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/08/18 v0.1 Typesetting FAO Yearbook]
+[2013/12/10 v0.2 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -205,7 +205,7 @@
     \begin{picture}(0,0)
       \put(-14,45){\color{@bgcolor!10}%
         \raisebox{-\height}{%
-          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.5cm)}}}
+          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.8cm)}}}
     \end{picture}}
   \fancyhfoffset[LR]{1.8cm}%
   \renewcommand\headrulewidth{\z@}%
@@ -480,7 +480,7 @@
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
       \setbox\@outputbox\vbox\bgroup
       \boxmaxdepth \@maxdepth
-      \vsplit \@curr@nfbox@T@uc to \textheight
+      \vsplit \curr@nfbox@T@uc to \textheight
       \egroup
     \else
      \setbox\@outputbox\vbox\bgroup
@@ -653,7 +653,7 @@
   \cleardoublepage\bgroup\color{@bgcolor}%
   \secdef\@part\@spart}
 \def\EndPartIntro{\egroup
-  \clearspread\twocolumn
+  \twocolumn
   \pagestyle{standardpagestyle}}
 \def\iconfill#1#2{%
   \@tempdima=#1
@@ -672,10 +672,15 @@
       \iconfill{.7cm}{7}\par
       \captionfamily
       \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
-      \parbox[b]{0.8\textwidth}{\fontsize{86\p@}{86\p@}\selectfont
-        \raggedright#2}\par\vskip120\p@
+      \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+        \raggedright\null#2\par}\par\vskip120\p@
     }\par}
 \def\sectionmark#1{\markright{#1}}
+\renewcommand\section{\if@twocolumn\clearspread\else\cleardoublepage\fi
+  \@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\Large\bfseries}}
 \newenvironment{tablepages}{\clearspread\if@twocolumn\onecolumn
   \bgroup\narrowfamily
   \def\emph{\textsl}%
