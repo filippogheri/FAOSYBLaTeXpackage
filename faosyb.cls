@@ -512,7 +512,6 @@
     \penalty\outputpenalty
   \fi}
 \def\nf@makemixedcol@{%
-  \typeout{Page=\thepage, vsize=\the\vsize, colroom=\the\@colroom}%
    \ifvoid\footins
      \setbox\@outputbox \box \@cclv
    \else
@@ -611,16 +610,13 @@
   \ht\nfbox@B@ul)}
  \def\nf@clearpage{%
   \write\m@ne{}%
-  \typeout{pagetotal=\the\pagetotal, page=\thepage}%
   \if@firstcolumn
-   \typeout{First column, page=\thepage}%
     \ifdim\dimexpr(\pagetotal+\nf@totalheight)>\baselineskip
     \leavevmode
      \null\vfill\newpage
      \null\vfill\newpage
     \fi
   \else
-  \typeout{Second column, page=\thepage}%
     \leavevmode
    \null\vfill\newpage
   \fi

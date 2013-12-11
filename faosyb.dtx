@@ -1769,7 +1769,6 @@
 %   And now the real work of \cs{nf@makemixedcol@}
 %    \begin{macrocode}
 \def\nf@makemixedcol@{%
-  \typeout{Page=\thepage, vsize=\the\vsize, colroom=\the\@colroom}%
    \ifvoid\footins
      \setbox\@outputbox \box \@cclv
    \else
@@ -1907,16 +1906,13 @@
 %    \begin{macrocode}
  \def\nf@clearpage{%
   \write\m@ne{}%
-  \typeout{pagetotal=\the\pagetotal, page=\thepage}%
   \if@firstcolumn
-   \typeout{First column, page=\thepage}%
     \ifdim\dimexpr(\pagetotal+\nf@totalheight)>\baselineskip
     \leavevmode
      \null\vfill\newpage
      \null\vfill\newpage
     \fi
   \else
-  \typeout{Second column, page=\thepage}%
     \leavevmode
    \null\vfill\newpage
   \fi
