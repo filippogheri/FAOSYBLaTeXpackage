@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/10 v0.2 Typesetting FAO Yearbook]
+[2013/12/11 v0.3 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -343,7 +343,7 @@
     {\color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{.1\p@}}%
     \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
     \vbox to \nf@captionheight\bgroup
-    \nf@caption\vfill
+    \nf@caption\vfill\normalcolor
     \egroup\par\nointerlineskip\vskip\nf@trianglebase
     \vskip\nf@margin
     \noindent\hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
@@ -352,10 +352,10 @@
     \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
     \vbox to \nf@sourceheight\bgroup
     \ifx\nf@source\@empty\else
-    \noindent{\color{@bgcolor}%
+    \noindent\color{@bgcolor}%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
-      \rule{.2em}{.2em}\par}
+      \rule{.2em}{.2em}\par
     \noindent Source: \nf@source\par\vfill\fi\egroup
     \vfill\egroup
     \edef\nf@currbox{\expandafter\csname nfbox@\nf@size
@@ -438,6 +438,8 @@
   \fi
 }
 \def\nf@output@widepage{%
+  \unvbox\@cclv
+  \penalty\outputpenalty
   \if@firstcolumn\else
   \ClassError{faosyb}{Wide or big nonfloats defined too late.  Move
     them up}{I encountered Big or Wide floats when I already made the
@@ -458,7 +460,6 @@
   \global\@colht\textheight
   \@outputpage
   \@firstcolumntrue
-  \unvbox\@cclv
 }
 \def\nf@makecol{%
   \global\@colroom\@colht
@@ -477,6 +478,8 @@
     \nf@makemixedcol
   \fi}
 \def\nf@makenfcol{%
+  \unvbox\@cclv
+  \penalty\outputpenalty
   \ifdim\@colht>0.9\textheight  % one tall or two squares
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
       \setbox\@outputbox\vbox\bgroup
@@ -498,18 +501,20 @@
       \setbox\@outputbox\vsplit \curr@nfbox@S@lc to 0.5\textheight
     \fi
   \fi
-  \unvbox\@cclv
-  \nf@opcol}
+  \nf@opcol
+}
 \def\nf@makemixedcol{%
   \ifdim\@colroom=\vsize
     \nf@makemixedcol@
   \else
     \global\vsize=\@colroom
     \unvbox\@cclv
+    \penalty\outputpenalty
   \fi}
 \def\nf@makemixedcol@{%
+  \typeout{Page=\thepage, vsize=\the\vsize, colroom=\the\@colroom}%
    \ifvoid\footins
-     \setbox\@outputbox \box\@cclv
+     \setbox\@outputbox \box \@cclv
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
@@ -568,7 +573,7 @@
     \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
       \setbox\@tempboxa\vsplit \curr@nfbox@W@ll to 0.5\textheight
       \setbox\@ouputbox\vbox\bgroup
-        \box\@outputpage
+        \box\@outputbox
         \nointerlineskip
         \box\@tempboxa
       \egroup
@@ -605,11 +610,20 @@
   \ht\nfbox@W@ll+
   \ht\nfbox@B@ul)}
  \def\nf@clearpage{%
-  \leavevmode
-  \null\vfill\penalty-\@M
   \write\m@ne{}%
-  \if@firstcolumn\else
-  \null\vfill\penalty-\@M\fi
+  \typeout{pagetotal=\the\pagetotal, page=\thepage}%
+  \if@firstcolumn
+   \typeout{First column, page=\thepage}%
+    \ifdim\dimexpr(\pagetotal+\nf@totalheight)>\baselineskip
+    \leavevmode
+     \null\vfill\newpage
+     \null\vfill\newpage
+    \fi
+  \else
+  \typeout{Second column, page=\thepage}%
+    \leavevmode
+   \null\vfill\newpage
+  \fi
   \ifdim\nf@totalheight>\baselineskip
   \nf@clearpage\fi
 }
@@ -633,7 +647,7 @@
 \def\fao@currentpartnum{0}
 \renewcommand\part{%
   \secdef\@part\@spart}
-\def\EndPartIntro{\twocolumn
+\def\EndPartIntro{\clearspread\twocolumn
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
 \def\iconfill#1#2{%
@@ -668,7 +682,7 @@
   \string\gdef\string\@maxpart{\thepart}}%
   \markboth{#1}{#1}%
   \null
-  \hspace{-3cm}\rotatebox{30}{\parbox{\textwidth}{%
+  \hspace{-2.2cm}\rotatebox{30}{\parbox{\textwidth}{%
       \iconfill{1cm}{\textwidth}\\
       \iconfill{1cm}{\textwidth}\\
       \iconfill{1cm}{\textwidth}\\
@@ -685,15 +699,17 @@
   }\par}
 \def\@spart#1{\@part[#1]{#1}}
 \def\sectionmark#1{\markright{#1}}
-\renewcommand\section{\if@twocolumn\clearspread\else\cleardoublepage\fi
+\renewcommand\section{\par\clearspread
   \@startsection {section}{1}{\z@}%
-                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {-1sp}%
                                    {2.3ex \@plus.2ex}%
-                                   {\normalfont\Large\bfseries}}
-\newenvironment{tablepages}{\clearpage\onecolumn\clearspread
-  \bgroup\narrowfamily
+                                   {\normalfont\Large\bfseries\raggedright
+                                   \color{@bgcolor}}}
+\newenvironment{tablepages}{\onecolumn
+  \bgroup\narrowfamily\multicolsep=\z@
+  \vspace*{-2cm}%
   \def\emph{\textsl}%
-  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%
+  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering\normalcolor}%
   {\end{adjmulticols}\egroup}
 \AtBeginDocument{\providecommand{\tablemph}[1]{\emph{#1}}}
 \newcolumntype{d}[1]{D{.}{.}{#1}}
@@ -719,7 +735,7 @@
           \fill (0,0) -- (\nf@trianglebase,0) --
           (.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
         \end{tikzpicture}}
-    \end{picture}%
+    \end{picture}\normalcolor
     \raisebox{-17pt}{\strut}}}
 \normalsize\normalfont
 \endinput

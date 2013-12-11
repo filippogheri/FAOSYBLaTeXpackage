@@ -37,7 +37,7 @@
 \ProvidesFile{faosyb.dtx}
 %</gobble>
 %<class>\ProvidesClass{faosyb}
-[2013/12/10 v0.2 Typesetting FAO Yearbook]
+[2013/12/11 v0.3 Typesetting FAO Yearbook]
 %<*gobble>
 %    \end{macrocode}
 %
@@ -1457,7 +1457,7 @@
     {\color{@bgcolor}\color@block{\nf@width}{\nf@captionheight}{.1\p@}}%
     \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
     \vbox to \nf@captionheight\bgroup    
-    \nf@caption\vfill
+    \nf@caption\vfill\normalcolor
     \egroup\par\nointerlineskip\vskip\nf@trianglebase
     \vskip\nf@margin
     \noindent\hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
@@ -1466,10 +1466,10 @@
     \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
     \vbox to \nf@sourceheight\bgroup
     \ifx\nf@source\@empty\else
-    \noindent{\color{@bgcolor}%
+    \noindent\color{@bgcolor}%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
-      \rule{.2em}{.2em}\par}
+      \rule{.2em}{.2em}\par
     \noindent Source: \nf@source\par\vfill\fi\egroup
     \vfill\egroup
     \edef\nf@currbox{\expandafter\csname nfbox@\nf@size 
@@ -1647,6 +1647,8 @@
 %   by wide pictures.
 %    \begin{macrocode}
 \def\nf@output@widepage{%
+  \unvbox\@cclv
+  \penalty\outputpenalty
   \if@firstcolumn\else
   \ClassError{faosyb}{Wide or big nonfloats defined too late.  Move
     them up}{I encountered Big or Wide floats when I already made the
@@ -1667,7 +1669,6 @@
   \global\@colht\textheight
   \@outputpage
   \@firstcolumntrue
-  \unvbox\@cclv
 }
 %    \end{macrocode}
 %   
@@ -1716,6 +1717,8 @@
 %   column, so we do not do any additional checks.
 %    \begin{macrocode}
 \def\nf@makenfcol{%
+  \unvbox\@cclv
+  \penalty\outputpenalty
   \ifdim\@colht>0.9\textheight  % one tall or two squares
     \ifdim\ht\curr@nfbox@T@uc>0.5\baselineskip
       \setbox\@outputbox\vbox\bgroup
@@ -1737,8 +1740,8 @@
       \setbox\@outputbox\vsplit \curr@nfbox@S@lc to 0.5\textheight
     \fi
   \fi
-  \unvbox\@cclv
-  \nf@opcol}
+  \nf@opcol
+}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1756,6 +1759,7 @@
   \else
     \global\vsize=\@colroom
     \unvbox\@cclv
+    \penalty\outputpenalty
   \fi}
 %    \end{macrocode}
 %   
@@ -1765,8 +1769,9 @@
 %   And now the real work of \cs{nf@makemixedcol@}
 %    \begin{macrocode}
 \def\nf@makemixedcol@{%
+  \typeout{Page=\thepage, vsize=\the\vsize, colroom=\the\@colroom}%
    \ifvoid\footins
-     \setbox\@outputbox \box\@cclv 
+     \setbox\@outputbox \box \@cclv
    \else
      \setbox\@outputbox \vbox {%
        \boxmaxdepth \@maxdepth
@@ -1834,7 +1839,7 @@
     \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
       \setbox\@tempboxa\vsplit \curr@nfbox@W@ll to 0.5\textheight
       \setbox\@ouputbox\vbox\bgroup
-        \box\@outputpage
+        \box\@outputbox
         \nointerlineskip
         \box\@tempboxa
       \egroup
@@ -1896,15 +1901,25 @@
 %   
 % \end{macro}
 %
+%
 % \begin{macro}{\nf@clearpage}
 %   We keep ejecting pages until get rid of nf stuff
 %    \begin{macrocode}
  \def\nf@clearpage{%
-  \leavevmode
-  \null\vfill\penalty-\@M
   \write\m@ne{}%
-  \if@firstcolumn\else
-  \null\vfill\penalty-\@M\fi
+  \typeout{pagetotal=\the\pagetotal, page=\thepage}%
+  \if@firstcolumn
+   \typeout{First column, page=\thepage}%
+    \ifdim\dimexpr(\pagetotal+\nf@totalheight)>\baselineskip
+    \leavevmode
+     \null\vfill\newpage
+     \null\vfill\newpage
+    \fi
+  \else
+  \typeout{Second column, page=\thepage}%
+    \leavevmode
+   \null\vfill\newpage
+  \fi
   \ifdim\nf@totalheight>\baselineskip
   \nf@clearpage\fi
 }
@@ -2008,9 +2023,10 @@
 %
 % \begin{macro}{\EndPartIntro}
 % \changes{v0.2}{2013/12/10}{Deleted \cs{clearspread}}
+% \changes{v0.3}{2013/12/11}{Restored \cs{clearspread}}
 %   This command switches off the  special formatting of part pages:
 %    \begin{macrocode}
-\def\EndPartIntro{\twocolumn
+\def\EndPartIntro{\clearspread\twocolumn
   \pagestyle{standardpagestyle}}
 %    \end{macrocode}
 %   
@@ -2062,7 +2078,7 @@
   \string\gdef\string\@maxpart{\thepart}}%
   \markboth{#1}{#1}%
   \null
-  \hspace{-3cm}\rotatebox{30}{\parbox{\textwidth}{%
+  \hspace{-2.2cm}\rotatebox{30}{\parbox{\textwidth}{%
       \iconfill{1cm}{\textwidth}\\
       \iconfill{1cm}{\textwidth}\\
       \iconfill{1cm}{\textwidth}\\
@@ -2102,11 +2118,12 @@
 %   New sections start on a recto page in one column mode and on a
 %   verso page in two column mode
 %    \begin{macrocode}
-\renewcommand\section{\if@twocolumn\clearspread\else\cleardoublepage\fi
+\renewcommand\section{\par\clearspread
   \@startsection {section}{1}{\z@}%
-                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {-1sp}%
                                    {2.3ex \@plus.2ex}%
-                                   {\normalfont\Large\bfseries}}
+                                   {\normalfont\Large\bfseries\raggedright
+                                   \color{@bgcolor}}}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2117,10 +2134,11 @@
 % \begin{macro}{\tablepages}
 %   Long tables at the end of a part
 %    \begin{macrocode}
-\newenvironment{tablepages}{\clearpage\onecolumn\clearspread
-  \bgroup\narrowfamily
+\newenvironment{tablepages}{\onecolumn
+  \bgroup\narrowfamily\multicolsep=\z@
+  \vspace*{-2cm}%
   \def\emph{\textsl}%
-  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%
+  \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering\normalcolor}%
   {\end{adjmulticols}\egroup}
 %    \end{macrocode}
 %   
@@ -2190,7 +2208,7 @@
           \fill (0,0) -- (\nf@trianglebase,0) -- 
           (.5\nf@trianglebase,-\nf@trianglebase) -- cycle;
         \end{tikzpicture}}
-    \end{picture}%
+    \end{picture}\normalcolor
     \raisebox{-17pt}{\strut}}}
 %    \end{macrocode}
 %   
