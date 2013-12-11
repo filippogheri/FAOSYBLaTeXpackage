@@ -1081,6 +1081,15 @@
 % \end{macro}
 %
 %
+% \begin{macro}{\newicon}
+% \changes{v0.2}{2013/12/10}{Added macro}
+%   Define an icon |#2| for the part |#1|
+%    \begin{macrocode}
+\def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 %\subsection{Page Styles}
 %\label{sec:pagestyles}
 %
@@ -1095,10 +1104,9 @@
     \Huge\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
   \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
-    \Huge\leftmark
-    \ifx\currenticon\@undefined\else\space
-  \raisebox{-0.25\totalheight}{%
-    \includegraphics[width=1.1cm]{\currenticon}}\fi}%
+    \Huge\leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
+      \raisebox{-0.25\totalheight}{%
+        \includegraphics[width=1.1cm]{\csname @icon@\thepart\endcsname}}\fi}%
   \fancyfoot[LE]{
     \bgroup
     \setlength\fboxsep{10\p@}%
@@ -1658,6 +1666,8 @@
   \global\vsize\textheight
   \global\@colht\textheight
   \@outputpage
+  \@firstcolumntrue
+  \unvbox\@cclv
 }
 %    \end{macrocode}
 %   
@@ -1692,7 +1702,6 @@
 %    \begin{macrocode}
   \ifdim\@colroom<0.5\baselineskip
     \nf@makenfcol
-    \unvbox\@cclv
   \else
     \nf@makemixedcol
   \fi}
@@ -1728,13 +1737,14 @@
       \setbox\@outputbox\vsplit \curr@nfbox@S@lc to 0.5\textheight
     \fi
   \fi
+  \unvbox\@cclv
   \nf@opcol}
 %    \end{macrocode}
 %   
 % \end{macro}
 %
 % \begin{macro}{\nf@makemixedcol}
-%   This macrois used when we have a mix of text with nonfloats (or
+%   This macros used when we have a mix of text with nonfloats (or
 %   possibly just text).  
 %
 %   We check whether the page builder has the right idea about
@@ -1889,22 +1899,14 @@
 % \begin{macro}{\nf@clearpage}
 %   We keep ejecting pages until get rid of nf stuff
 %    \begin{macrocode}
-\def\nf@clearpage{%
-  \ifvmode
-    \ifnum \@dbltopnum =\m@ne
-      \ifdim \pagetotal <\topskip
-        \hbox{}%
-      \fi
-    \fi
-  \fi
-  \newpage
+ \def\nf@clearpage{%
+  \leavevmode
+  \null\vfill\penalty-\@M
   \write\m@ne{}%
-  \vbox{}%
-  \penalty -\@Mi
   \if@firstcolumn\else
-  \null\vfill\newpage\fi
+  \null\vfill\penalty-\@M\fi
   \ifdim\nf@totalheight>\baselineskip
-  \null\vfill\clearpage\fi
+  \nf@clearpage\fi
 }
 %    \end{macrocode}
 %   
@@ -1913,8 +1915,8 @@
 % \begin{macro}{\clearspread}
 %   This is like \cs{cleardoublepage}, but with the logic inverted:
 %    \begin{macrocode}
-\def\clearspread{\clearpage\if@twoside \ifodd\c@page
-    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\def\clearspread{\clearpage\ifodd\c@page
+    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\@firstcolumntrue}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2000,19 +2002,6 @@
 %  The largest partition in the book
 %    \begin{macrocode}
 \renewcommand\part{%
-  \clearspread
-  \selectcolor
-  \selecticon
-  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{\fao@color@string}}%
-  \stepcounter{fao@partnum}%
-  \addtocontents{toc}{%
-    \string\gdef\string\fao@currentpartnum{\thefao@partnum}}%
-  \rowcolors{2}{@bgcolor!10}{}%
-  \pagestyle{partpagestyle}%
-  \if@twocolumn
-    \onecolumn
-  \fi
-  \cleardoublepage\bgroup\color{@bgcolor}%
   \secdef\@part\@spart}
 %    \end{macrocode}
 % \end{macro}
@@ -2021,26 +2010,34 @@
 % \changes{v0.2}{2013/12/10}{Deleted \cs{clearspread}}
 %   This command switches off the  special formatting of part pages:
 %    \begin{macrocode}
-\def\EndPartIntro{\egroup
-  \twocolumn
+\def\EndPartIntro{\twocolumn
   \pagestyle{standardpagestyle}}
 %    \end{macrocode}
 %   
 % \end{macro}
 %
 % \begin{macro}{iconfill}
-%   Fill a line with the current icon of increasing size.  The
-%   parameters are the initial size and number of repetitions
+% \changes{v0.2}{2013/12/10}{Rewrote}
+%   Fill a line with the icons of increasing size.  The
+%   parameters are the initial size and length of the strip
 %    \begin{macrocode}
+\def\@maxpart{1}
 \def\iconfill#1#2{%
-  \@tempdima=#1
-  \@tempcnta=#2
-  \hfill
+  \expandafter\ifx\csname @icon@1\endcsname\relax\else
+  \@tempcnta=1
+  \setbox\@tempboxa=\hbox{}%
   \loop
-  \includegraphics[width=\@tempdima]{\currenticon}%
-  \@tempdima=1.44\@tempdima
-  \advance\@tempcnta by -1
-  \ifnum\@tempcnta>0\repeat\hfill}
+  \@tempdima=#1
+  \ifnum\@tempcnta=\c@part
+  \@tempdima=2\@tempdima\fi
+  \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
+    \includegraphics[width=\@tempdima]{\csname
+      @icon@\the\@tempcnta\endcsname}}%
+  \advance\@tempcnta by 1\relax
+  \ifnum\@tempcnta>\@maxpart\relax\@tempcnta=1\fi
+  \ifdim\wd\@tempboxa>#2\else\repeat
+  \unhbox\@tempboxa
+  \fi}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2050,19 +2047,48 @@
 %   This is the actual part making macro.
 %    \begin{macrocode}
 \def\@part[#1]#2{%
-      \refstepcounter{part}%
-      \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
-    \markboth{#1}{#1}%
-    {\interlinepenalty \@M
-      \iconfill{.7cm}{7}\par
-      \captionfamily
-      \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
-      \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
-        \raggedright\null#2\par}\par\vskip120\p@
-    }\par}
+  \clearspread
+  \onecolumn  
+  \clearspread
+  \selectcolor
+  \selecticon
+  \color{@bgcolor}%
+  \rowcolors{2}{@bgcolor!10}{}%
+  \pagestyle{partpagestyle}%
+  \refstepcounter{part}%
+  \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+  \protected@write\@auxout{}%
+  {\string\newicon{\thepart}{\currenticon}
+  \string\gdef\string\@maxpart{\thepart}}%
+  \markboth{#1}{#1}%
+  \null
+  \hspace{-3cm}\rotatebox{30}{\parbox{\textwidth}{%
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}}}
+  \newpage
+  {\interlinepenalty \@M
+    \vspace*{-2cm}%
+    \null\rlap{\rotatebox{30}{\iconfill{1cm}{\textwidth}}}\par
+    \captionfamily
+    \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
+    \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+      \raggedright\null#2\par}\par\vskip80\p@
+  }\par}
 %    \end{macrocode}
 % \end{macro}
 % 
+% \begin{macro}{\@spart}
+%   We really do not use unnumbered parts
+%    \begin{macrocode}
+\def\@spart#1{\@part[#1]{#1}}
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+%
 % \begin{macro}{\sectionmark}
 %   We do not want to have uppercase sections in the footers
 %    \begin{macrocode}
@@ -2091,7 +2117,7 @@
 % \begin{macro}{\tablepages}
 %   Long tables at the end of a part
 %    \begin{macrocode}
-\newenvironment{tablepages}{\clearspread\if@twocolumn\onecolumn
+\newenvironment{tablepages}{\clearpage\onecolumn\clearspread
   \bgroup\narrowfamily
   \def\emph{\textsl}%
   \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%

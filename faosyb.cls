@@ -169,6 +169,7 @@
 \def\seticon#1{\gdef\next@icon{#1}}
 \define@key{fao}{icon}{\seticon{#1}}
 \def\selecticon{\gdef\currenticon{\next@icon}}
+\def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
   \fancyhfoffset[LR]{1.8cm}%
@@ -177,10 +178,9 @@
     \Huge\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
   \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
-    \Huge\leftmark
-    \ifx\currenticon\@undefined\else\space
-  \raisebox{-0.25\totalheight}{%
-    \includegraphics[width=1.1cm]{\currenticon}}\fi}%
+    \Huge\leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
+      \raisebox{-0.25\totalheight}{%
+        \includegraphics[width=1.1cm]{\csname @icon@\thepart\endcsname}}\fi}%
   \fancyfoot[LE]{
     \bgroup
     \setlength\fboxsep{10\p@}%
@@ -457,6 +457,8 @@
   \global\vsize\textheight
   \global\@colht\textheight
   \@outputpage
+  \@firstcolumntrue
+  \unvbox\@cclv
 }
 \def\nf@makecol{%
   \global\@colroom\@colht
@@ -471,7 +473,6 @@
   \fi
   \ifdim\@colroom<0.5\baselineskip
     \nf@makenfcol
-    \unvbox\@cclv
   \else
     \nf@makemixedcol
   \fi}
@@ -497,6 +498,7 @@
       \setbox\@outputbox\vsplit \curr@nfbox@S@lc to 0.5\textheight
     \fi
   \fi
+  \unvbox\@cclv
   \nf@opcol}
 \def\nf@makemixedcol{%
   \ifdim\@colroom=\vsize
@@ -602,25 +604,17 @@
   \ht\nfbox@W@ul+
   \ht\nfbox@W@ll+
   \ht\nfbox@B@ul)}
-\def\nf@clearpage{%
-  \ifvmode
-    \ifnum \@dbltopnum =\m@ne
-      \ifdim \pagetotal <\topskip
-        \hbox{}%
-      \fi
-    \fi
-  \fi
-  \newpage
+ \def\nf@clearpage{%
+  \leavevmode
+  \null\vfill\penalty-\@M
   \write\m@ne{}%
-  \vbox{}%
-  \penalty -\@Mi
   \if@firstcolumn\else
-  \null\vfill\newpage\fi
+  \null\vfill\penalty-\@M\fi
   \ifdim\nf@totalheight>\baselineskip
-  \null\vfill\clearpage\fi
+  \nf@clearpage\fi
 }
-\def\clearspread{\clearpage\if@twoside \ifodd\c@page
-    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\def\clearspread{\clearpage\ifodd\c@page
+    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\@firstcolumntrue}
 \AtEndDocument{\if@twocolumn
   \ifdim\nf@totalheight>\baselineskip
   \null\vfill\clearpage\fi
@@ -638,50 +632,65 @@
 \setcounter{fao@partnum}{0}
 \def\fao@currentpartnum{0}
 \renewcommand\part{%
+  \secdef\@part\@spart}
+\def\EndPartIntro{\twocolumn
+  \pagestyle{standardpagestyle}}
+\def\@maxpart{1}
+\def\iconfill#1#2{%
+  \expandafter\ifx\csname @icon@1\endcsname\relax\else
+  \@tempcnta=1
+  \setbox\@tempboxa=\hbox{}%
+  \loop
+  \@tempdima=#1
+  \ifnum\@tempcnta=\c@part
+  \@tempdima=2\@tempdima\fi
+  \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
+    \includegraphics[width=\@tempdima]{\csname
+      @icon@\the\@tempcnta\endcsname}}%
+  \advance\@tempcnta by 1\relax
+  \ifnum\@tempcnta>\@maxpart\relax\@tempcnta=1\fi
+  \ifdim\wd\@tempboxa>#2\else\repeat
+  \unhbox\@tempboxa
+  \fi}
+\def\@part[#1]#2{%
+  \clearspread
+  \onecolumn
   \clearspread
   \selectcolor
   \selecticon
-  \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{\fao@color@string}}%
-  \stepcounter{fao@partnum}%
-  \addtocontents{toc}{%
-    \string\gdef\string\fao@currentpartnum{\thefao@partnum}}%
+  \color{@bgcolor}%
   \rowcolors{2}{@bgcolor!10}{}%
   \pagestyle{partpagestyle}%
-  \if@twocolumn
-    \onecolumn
-  \fi
-  \cleardoublepage\bgroup\color{@bgcolor}%
-  \secdef\@part\@spart}
-\def\EndPartIntro{\egroup
-  \twocolumn
-  \pagestyle{standardpagestyle}}
-\def\iconfill#1#2{%
-  \@tempdima=#1
-  \@tempcnta=#2
-  \hfill
-  \loop
-  \includegraphics[width=\@tempdima]{\currenticon}%
-  \@tempdima=1.44\@tempdima
-  \advance\@tempcnta by -1
-  \ifnum\@tempcnta>0\repeat\hfill}
-\def\@part[#1]#2{%
-      \refstepcounter{part}%
-      \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
-    \markboth{#1}{#1}%
-    {\interlinepenalty \@M
-      \iconfill{.7cm}{7}\par
-      \captionfamily
-      \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
-      \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
-        \raggedright\null#2\par}\par\vskip120\p@
-    }\par}
+  \refstepcounter{part}%
+  \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+  \protected@write\@auxout{}%
+  {\string\newicon{\thepart}{\currenticon}
+  \string\gdef\string\@maxpart{\thepart}}%
+  \markboth{#1}{#1}%
+  \null
+  \hspace{-3cm}\rotatebox{30}{\parbox{\textwidth}{%
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}\\
+      \iconfill{1cm}{\textwidth}}}
+  \newpage
+  {\interlinepenalty \@M
+    \vspace*{-2cm}%
+    \null\rlap{\rotatebox{30}{\iconfill{1cm}{\textwidth}}}\par
+    \captionfamily
+    \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
+    \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+      \raggedright\null#2\par}\par\vskip80\p@
+  }\par}
+\def\@spart#1{\@part[#1]{#1}}
 \def\sectionmark#1{\markright{#1}}
 \renewcommand\section{\if@twocolumn\clearspread\else\cleardoublepage\fi
   \@startsection {section}{1}{\z@}%
                                    {-3.5ex \@plus -1ex \@minus -.2ex}%
                                    {2.3ex \@plus.2ex}%
                                    {\normalfont\Large\bfseries}}
-\newenvironment{tablepages}{\clearspread\if@twocolumn\onecolumn
+\newenvironment{tablepages}{\clearpage\onecolumn\clearspread
   \bgroup\narrowfamily
   \def\emph{\textsl}%
   \begin{adjmulticols}{1}{-1.3cm}{-1.3cm}\centering}%
