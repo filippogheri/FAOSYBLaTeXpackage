@@ -637,7 +637,7 @@
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
 \def\iconfill#1#2{%
-  \expandafter\ifx\csname @icon@1\endcsname\relax\else
+  \expandafter\ifx\csname @icon@1\endcsname\relax\strut\else
   \@tempcnta=1
   \setbox\@tempboxa=\hbox{}%
   \loop
