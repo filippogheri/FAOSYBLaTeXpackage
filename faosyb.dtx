@@ -1021,9 +1021,11 @@
 %   The command |\setbgcolor| selects the next background color:
 %    \begin{macrocode}
 \def\setbgcolor#1{\colorlet{@bgcolor@next}[cmyk]{#1}%
+  \@for\curr@ext:=\@toc@ext@list\do{%
+    \addtocontents{\curr@ext}{\string\colorlet{@bgcolor}[cmyk]{#1}}}%
   \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{#1}}%
   \gdef\fao@color@string{#1}}
-\setbgcolor{white}
+\colorlet{@bgcolor@next}[cmyk]{white}
 %    \end{macrocode}
 % \end{macro}   
 % \end{macro}
@@ -1169,6 +1171,15 @@
 % In Faoyearbook we used float package.  Since we changed too much in
 % the internals, here we just rewrite the code from scratch.
 %
+% \begin{macro}{\@toc@ext@list}
+% \changes{v0.3}{2013/12}{11}{Added macro}
+%   Comma-separated list of extensions for toc-like files:
+%    \begin{macrocode}
+\gdef\@toc@ext@list{toc}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 % \begin{macro}{\nf@vert@sep}
 %   Vertical separation between the floats
 %    \begin{macrocode}
@@ -1284,14 +1295,16 @@
 % \end{macro}
 %
 % \begin{macro}{\newnon@float}
+% \changes{v0.3}{2013/12/11}{Added writing extensions to the list of
+% extensions} 
 %   The macro \cs{newnon@float} has the following arguments:  TYPE,
-%   EXT, NAME, LISTNAME, for example
+%   EXT, NAME for example
 % \begin{verbatim}
-% \newnon@float{map}{lom}{Map}{List of Maps}
+% \newnon@float{map}{lom}{Map}
 % \end{verbatim}
 %   It defines a nonfloat with these parameters.
 %    \begin{macrocode}
-\def\newnon@float#1#2#3#4{%
+\def\newnon@float#1#2#3{%
 %    \end{macrocode}
 %   First, we need to define |\ftype@TYPE|: the type of the float.
 %   Note that tables are taken, so we need to make a special care of
@@ -1305,6 +1318,7 @@
 % Now we define the extension for the floats
 %    \begin{macrocode}
   \expandafter\def\csname ext@#1\endcsname{#2}%
+  \xdef\@toc@ext@list{\@toc@ext@list,#2}%
 %    \end{macrocode}
 % The macro \cs{fnum@TYPE} formats the line like ``Figure 1''.  We
 % need to check whether the counter is defined
@@ -1483,25 +1497,41 @@
 % \begin{macro}{\map}
 %   A standard nonfloat:
 %    \begin{macrocode}
-\newnon@float{map}{lom}{Map}{List of Maps}
+\newnon@float{map}{lom}{Map}
 %    \end{macrocode}
-%   
 % \end{macro}
+% 
+%
+% \begin{macro}{\listofmapsname}
+%   \changes{v0.3}{2013/12/11}{Added macro}
+% The name for the list of maps
+%    \begin{macrocode}
+\def\listofmapsname{List of Maps}
+%    \end{macrocode}
+% \end{macro}
+% 
 % \begin{macro}{\table}
 %   Another one
 %    \begin{macrocode}
-\newnon@float{table}{lot}{Table}{List of Tables}
+\newnon@float{table}{lot}{Table}
 %    \end{macrocode}
 %   
 % \end{macro}
 % \begin{macro}{\chart}
 %   And another one
 %    \begin{macrocode}
-\newnon@float{chart}{loc}{Chart}{List of Charts}
+\newnon@float{chart}{loc}{Chart}
 %    \end{macrocode}
 %   
 % \end{macro}
 %
+% \begin{macro}{\listofchartsname}
+%   \changes{v0.3}{2013/12/11}{Added macro}
+% The name for the list of charts
+%    \begin{macrocode}
+\def\listofchartsname{List of charts}
+%    \end{macrocode}
+% \end{macro}
 %
 %\subsection{Output Routine}
 %\label{sec:output_routine}
@@ -2210,10 +2240,134 @@
 %   
 % \end{macro}
 % 
+%
+%\subsection{Front Matter}
+%\label{sec:frontmatter}
+%
+% \begin{macro}{\@generictoc}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   This is a generic macro with two parameters: name of the toc and
+%   file extension
+%    \begin{macrocode}
+\def\@generictoc#1#2{\clearspread
+  {\fontsize{48pt}{48pt}\selectfont
+    \captionfamily\color{black!40}#1\par}\@mkboth{#1}{#1}\bigskip
+  \@starttoc{#2}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\tableofcontents}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Our table of contents
+%    \begin{macrocode}
+\renewcommand\tableofcontents{\@generictoc{\contentsname}{toc}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\l@part}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   The way to put the part in the table of contents.  We do not want
+%   bold here
+%    \begin{macrocode}
+\renewcommand*\l@part[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \addvspace{2.25em \@plus\p@}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode\color{@bgcolor}%
+       \large  #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\l@nonfloat}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   The generic listing of a nonfloat in a list
+%    \begin{macrocode}
+\newcommand*\l@nonfloat{\@dottedtocline{1}{\z@}{2.3em}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\numberline}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   The number in table of contents
+%    \begin{macrocode}
+\def\numberline#1{%
+  \raisebox{\z@}[\z@][\z@]{%
+    \fcolorbox{@bgcolor}{@bgcolor}{%
+      \hb@xt@\@tempdima{\color{white}#1\strut\hfil}}}\hspace{2em}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\listofmaps}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Our list of maps
+%    \begin{macrocode}
+\newcommand\listofmaps{\@generictoc{\listofmapsname}{lom}}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\l@map}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Entry in the list of maps
+%    \begin{macrocode}
+\let\l@map\l@nonfloat
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+% \begin{macro}{\listoftables}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Our list of tables
+%    \begin{macrocode}
+\renewcommand\listoftables{\@generictoc{\listtablename}{lot}}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\l@table}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Entry in the list of tables
+%    \begin{macrocode}
+\let\l@table\l@nonfloat
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+% \begin{macro}{\listofcharts}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Our list of charts
+%    \begin{macrocode}
+\newcommand\listofcharts{\@generictoc{\listofchartsname}{loc}}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\l@chart}
+% \changes{v0.3}{2012/12/11}{Added macro}
+%   Entry in the list of charts
+%    \begin{macrocode}
+\let\l@chart\l@nonfloat
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 % \subsection{The final word}
 %\label{sec:final}
 %
 %    \begin{macrocode}
+\setbgcolor{white}
 \normalsize\normalfont
 %</class>      
 %    \end{macrocode}

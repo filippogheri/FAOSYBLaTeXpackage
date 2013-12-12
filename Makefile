@@ -30,6 +30,7 @@ all:  ${PDF}
 %.pdf:  %.tex   $(PACKAGE).cls
 	pdflatex $<
 	- bibtex $*
+	pdflatex $*
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $*.log) \
 	do pdflatex $<; done
 

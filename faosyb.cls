@@ -157,9 +157,11 @@
           DRAFT}}}}\fi}
 \def\fao@color@string{0,0,0}
 \def\setbgcolor#1{\colorlet{@bgcolor@next}[cmyk]{#1}%
+  \@for\curr@ext:=\@toc@ext@list\do{%
+    \addtocontents{\curr@ext}{\string\colorlet{@bgcolor}[cmyk]{#1}}}%
   \addtocontents{toc}{\string\colorlet{@bgcolor}[cmyk]{#1}}%
   \gdef\fao@color@string{#1}}
-\setbgcolor{white}
+\colorlet{@bgcolor@next}[cmyk]{white}
 \define@key{fao}{bgcolor}{\setbgcolor{#1}}
 \define@key{fao}{tableheadcolor}{\colorlet{@tableheadcolor}[cmyk]{#1}}
 \def\selectcolor{\colorlet{@bgcolor}{@bgcolor@next}%
@@ -226,6 +228,7 @@
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
 }
+\gdef\@toc@ext@list{toc}
 \newlength\nf@vert@sep
 \setlength\nf@vert@sep{30pt}
 \newlength\nf@width
@@ -246,12 +249,13 @@
 \nonfloat@type=4\relax
 \newbox\nf@contentsbox
 \newbox\nf@mainbox
-\def\newnon@float#1#2#3#4{%
+\def\newnon@float#1#2#3{%
   \expandafter\ifx\csname ftype@#1\endcsname\relax
     \expandafter\edef\csname ftype@#1\endcsname{\the\nonfloat@type}%
     \multiply\nonfloat@type by 2\relax
   \fi
   \expandafter\def\csname ext@#1\endcsname{#2}%
+  \xdef\@toc@ext@list{\@toc@ext@list,#2}%
   \expandafter\ifx\csname the#1\endcsname\relax
   \newcounter{#1}\fi
   \expandafter\def\csname fnum@#1\endcsname{#3~\csname
@@ -362,9 +366,11 @@
       @\nf@placement\endcsname}%
     \global\setbox\nf@currbox=
     \vbox{\box\nf@currbox\nointerlineskip\penalty0\box\nf@mainbox}}
-\newnon@float{map}{lom}{Map}{List of Maps}
-\newnon@float{table}{lot}{Table}{List of Tables}
-\newnon@float{chart}{loc}{Chart}{List of Charts}
+\newnon@float{map}{lom}{Map}
+\def\listofmapsname{List of Maps}
+\newnon@float{table}{lot}{Table}
+\newnon@float{chart}{loc}{Chart}
+\def\listofchartsname{List of charts}
 \newbox\nfbox@S@ul
 \newbox\nfbox@S@ur
 \newbox\nfbox@S@ll
@@ -733,6 +739,38 @@
         \end{tikzpicture}}
     \end{picture}\normalcolor
     \raisebox{-17pt}{\strut}}}
+\def\@generictoc#1#2{\clearspread
+  {\fontsize{48pt}{48pt}\selectfont
+    \captionfamily\color{black!40}#1\par}\@mkboth{#1}{#1}\bigskip
+  \@starttoc{#2}}
+\renewcommand\tableofcontents{\@generictoc{\contentsname}{toc}}
+\renewcommand*\l@part[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \addvspace{2.25em \@plus\p@}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode\color{@bgcolor}%
+       \large  #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+\newcommand*\l@nonfloat{\@dottedtocline{1}{\z@}{2.3em}}
+\def\numberline#1{%
+  \raisebox{\z@}[\z@][\z@]{%
+    \fcolorbox{@bgcolor}{@bgcolor}{%
+      \hb@xt@\@tempdima{\color{white}#1\strut\hfil}}}\hspace{2em}}
+\newcommand\listofmaps{\@generictoc{\listofmapsname}{lom}}
+\let\l@map\l@nonfloat
+\renewcommand\listoftables{\@generictoc{\listtablename}{lot}}
+\let\l@table\l@nonfloat
+\newcommand\listofcharts{\@generictoc{\listofchartsname}{loc}}
+\let\l@chart\l@nonfloat
+\setbgcolor{white}
 \normalsize\normalfont
 \endinput
 %%
