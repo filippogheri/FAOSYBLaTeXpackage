@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/13 v1.0 Typesetting FAO Yearbook]
+[2013/12/13 v1.1 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -174,12 +174,12 @@
 \def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
 \newcommand\colored@icon[2][]{\bgroup\fboxsep=-1pt%
   \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}
-\newcommand\colored@icon@fg[2][]{\bgroup\fboxsep=\z@%
+\newcommand\colored@icon@fg[3][]{\bgroup\fboxsep=\z@%
   \sbox\@tempboxa{\bgroup\fboxsep=-.2pt%
-  \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}%
+  \fcolorbox{white}{@bgcolor!#3}{\includegraphics[#1]{#2}}\egroup}%
   \rlap{\copy\@tempboxa}%
   \rlap{\tikz\filldraw[color=@bgcolor!10, fill=@bgcolor,
-  fill opacity=.12, draw opacity=1, line width=1pt, baseline] (0,0)
+  fill opacity=.10, draw opacity=1, line width=1pt, baseline] (0,0)
   rectangle (\wd\@tempboxa,\ht\@tempboxa);}%
   \tikz[baseline]\draw[color=@bgcolor!10,
   very thick](0,0.2pt) -- (\wd\@tempboxa,-.2pt);\egroup}
@@ -663,20 +663,29 @@
 \def\EndPartIntro{\clearspread\twocolumn
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
-\def\iconfill#1#2{%
+\def\iconfill#1#2#3{%
   \expandafter\ifx\csname @icon@1\endcsname\relax\strut\else
   \@tempcnta=1
   \setbox\@tempboxa=\hbox{}%
   \loop
   \@tempdima=#1
-  \ifnum\numexpr(\c@part-\@tempcnta)=0\relax
-   \@tempdima=2\@tempdima
-  \fi
   \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
     \colored@icon@fg[width=\@tempdima]{\csname
-      @icon@\the\@tempcnta\endcsname}}%
+      @icon@\the\@tempcnta\endcsname}{#3}}%
   \advance\@tempcnta by 1\relax
   \ifnum\@tempcnta>\@maxpart\relax\@tempcnta=1\fi
+  \ifdim\wd\@tempboxa>#2\else\repeat
+  \unhbox\@tempboxa
+  \fi}
+\def\currenticonfill#1#2#3{%
+  \expandafter\ifx\csname @icon@\thepart\endcsname\relax\strut\else
+  \setbox\@tempboxa=\hbox{}%
+  \@tempdima=#1
+  \loop
+  \@tempdima=1.44\@tempdima
+  \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
+    \colored@icon@fg[width=\@tempdima]{\csname
+      @icon@\thepart\endcsname}{#3}}%
   \ifdim\wd\@tempboxa>#2\else\repeat
   \unhbox\@tempboxa
   \fi}
@@ -695,17 +704,17 @@
   {\string\newicon{\thepart}{\currenticon}
   \string\gdef\string\@maxpart{\thepart}}%
   \markboth{#1}{#1}%
+  \vspace*{120\p@}%
   \null
   \hspace{-2.2cm}\rotatebox{30}{\parbox{\textwidth}{%
-      \iconfill{1cm}{\textwidth}\\
-      \iconfill{1cm}{\textwidth}\\
-      \iconfill{1cm}{\textwidth}\\
-      \iconfill{1cm}{\textwidth}\\
-      \iconfill{1cm}{\textwidth}}}
+      \iconfill{1cm}{0.5\textwidth}{20}\currenticonfill{1cm}{0.4\textwidth}{20}\\
+      \iconfill{1cm}{1.15\textwidth}{100}\\
+      \iconfill{1cm}{1.14\textwidth}{20}}}
   \newpage
   {\interlinepenalty \@M
     \vspace*{-2cm}%
-    \null\rlap{\rotatebox{30}{\iconfill{1cm}{\textwidth}}}\par
+    \hspace*{4cm}\rlap{\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}\par
+    \vspace*{-80\p@}
     \captionfamily
     \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
