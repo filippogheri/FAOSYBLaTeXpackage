@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/11 v0.3 Typesetting FAO Yearbook]
+[2013/12/13 v1.0 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -172,17 +172,28 @@
 \define@key{fao}{icon}{\seticon{#1}}
 \def\selecticon{\gdef\currenticon{\next@icon}}
 \def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
+\newcommand\colored@icon[2][]{\bgroup\fboxsep=-1pt%
+  \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}
+\newcommand\colored@icon@fg[2][]{\bgroup\fboxsep=\z@%
+  \sbox\@tempboxa{\bgroup\fboxsep=-.2pt%
+  \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}%
+  \rlap{\copy\@tempboxa}%
+  \rlap{\tikz\filldraw[color=@bgcolor!10, fill=@bgcolor,
+  fill opacity=.12, draw opacity=1, line width=1pt, baseline] (0,0)
+  rectangle (\wd\@tempboxa,\ht\@tempboxa);}%
+  \tikz[baseline]\draw[color=@bgcolor!10,
+  very thick](0,0.2pt) -- (\wd\@tempboxa,-.2pt);\egroup}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
   \fancyhfoffset[LR]{1.8cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyhead[LE]{\color{@bgcolor}\captionfamily
-    \Huge\ifnum\thepart>0\relax
+    \Huge\strut\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
   \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
     \Huge\leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
       \raisebox{-0.25\totalheight}{%
-        \includegraphics[width=1.1cm]{\csname @icon@\thepart\endcsname}}\fi}%
+        \colored@icon[width=1.1cm]{\csname @icon@\thepart\endcsname}}\fi}%
   \fancyfoot[LE]{
     \bgroup
     \setlength\fboxsep{10\p@}%
@@ -359,7 +370,7 @@
     \noindent\color{@bgcolor}%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
-      \rule{.2em}{.2em}\par
+      \rule{.2em}{.2em}\par\normalcolor
     \noindent Source: \nf@source\par\vfill\fi\egroup
     \vfill\egroup
     \edef\nf@currbox{\expandafter\csname nfbox@\nf@size
@@ -658,10 +669,11 @@
   \setbox\@tempboxa=\hbox{}%
   \loop
   \@tempdima=#1
-  \ifnum\@tempcnta=\c@part
-  \@tempdima=2\@tempdima\fi
+  \ifnum\numexpr(\c@part-\@tempcnta)=0\relax
+   \@tempdima=2\@tempdima
+  \fi
   \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
-    \includegraphics[width=\@tempdima]{\csname
+    \colored@icon@fg[width=\@tempdima]{\csname
       @icon@\the\@tempcnta\endcsname}}%
   \advance\@tempcnta by 1\relax
   \ifnum\@tempcnta>\@maxpart\relax\@tempcnta=1\fi
