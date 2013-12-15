@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/13 v1.1 Typesetting FAO Yearbook]
+[2013/12/15 v1.2 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -123,7 +123,7 @@
 \savegeometry{standard}
 \setlength\parindent\z@
 \setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
-\setlength\footskip{18\p@}
+\setlength\footskip{27\p@}
 \setlength\headheight{35\p@}
 \AtBeginDocument{\ifprint
   \AtBeginShipout{%
@@ -174,53 +174,52 @@
 \def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
 \newcommand\colored@icon[2][]{\bgroup\fboxsep=-1pt%
   \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}
-\newcommand\colored@icon@fg[3][]{\bgroup\fboxsep=\z@%
-  \sbox\@tempboxa{\bgroup\fboxsep=-.2pt%
-  \fcolorbox{white}{@bgcolor!#3}{\includegraphics[#1]{#2}}\egroup}%
-  \rlap{\copy\@tempboxa}%
-  \rlap{\tikz\filldraw[color=@bgcolor!10, fill=@bgcolor,
-  fill opacity=.10, draw opacity=1, line width=1pt, baseline] (0,0)
-  rectangle (\wd\@tempboxa,\ht\@tempboxa);}%
-  \tikz[baseline]\draw[color=@bgcolor!10,
-  very thick](0,0.2pt) -- (\wd\@tempboxa,-.2pt);\egroup}
+\newcommand\colored@icon@fg[3][]{\bgroup\fboxsep=-1\p@%
+  \fcolorbox{white}{@bgcolor!#3}{\includegraphics[#1]{#2}}\egroup}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
-  \fancyhfoffset[LR]{1.8cm}%
+  \fancyhfoffset[LR]{2.22cm}%
   \renewcommand\headrulewidth{\z@}%
-  \fancyhead[LE]{\color{@bgcolor}\captionfamily
+  \fancyhead[LE]{\hspace*{25\p@}\color{@bgcolor}\captionfamily
     \Huge\strut\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
-  \fancyhead[LO]{\color{@bgcolor}\normalsize\dotfill\captionfamily
+  \fancyhead[LO]{\hspace*{25\p@}\color{@bgcolor}\normalsize\dotfill\captionfamily
     \Huge\leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
       \raisebox{-0.25\totalheight}{%
-        \colored@icon[width=1.1cm]{\csname @icon@\thepart\endcsname}}\fi}%
+        \colored@icon[width=1.1cm]{\csname
+          @icon@\thepart\endcsname}}\fi
+      \hspace*{25\p@}}%
   \fancyfoot[LE]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace*{25\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
 }
 \pagestyle{standardpagestyle}
+\def\@partpagepicture{}
 \fancypagestyle{partpagestyle}{%
   \fancyhf{}%
   \fancyhead[L]{%
     \begin{picture}(0,0)
-      \put(-14,45){\color{@bgcolor!10}%
-        \raisebox{-\height}{%
-          \rule{\dimexpr(\textwidth+4.5cm)}{\dimexpr(\textheight+4.8cm)}}}
+      \@partpagepicture
+      \put(-14,50){%
+        \raisebox{-\height}{\begin{tikzpicture}
+          \fill[color=@bgcolor,opacity=.1]
+          (0,0) rectangle ($(\textwidth,\textheight)+(5cm,5cm)$);
+        \end{tikzpicture}}}
     \end{picture}}
-  \fancyhfoffset[LR]{1.8cm}%
+  \fancyhfoffset[LR]{2.22cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyfoot[LE]{
     \bgroup
@@ -228,13 +227,13 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}%
+    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace{20\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
@@ -702,19 +701,19 @@
   \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
   \protected@write\@auxout{}%
   {\string\newicon{\thepart}{\currenticon}
-  \string\gdef\string\@maxpart{\thepart}}%
-  \markboth{#1}{#1}%
-  \vspace*{120\p@}%
-  \null
-  \hspace{-2.2cm}\rotatebox{30}{\parbox{\textwidth}{%
+    \string\gdef\string\@maxpart{\thepart}}%
+  \def\@partpagepicture{%
+    \put(-20,-500){\rotatebox{30}{\parbox{\textwidth}{%
       \iconfill{1cm}{0.5\textwidth}{20}\currenticonfill{1cm}{0.4\textwidth}{20}\\
       \iconfill{1cm}{1.15\textwidth}{100}\\
-      \iconfill{1cm}{1.14\textwidth}{20}}}
+      \iconfill{1cm}{1.14\textwidth}{20}}}}}%
+  \markboth{#1}{#1}%
+  \null
   \newpage
+  \def\@partpagepicture{\put(150,-200){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
+  \gdef\@partpagepicture{}}
   {\interlinepenalty \@M
-    \vspace*{-2cm}%
-    \hspace*{4cm}\rlap{\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}\par
-    \vspace*{-80\p@}
+    \vspace*{80\p@}
     \captionfamily
     \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
