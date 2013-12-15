@@ -276,6 +276,23 @@
 % |\EndPartIntro| switches to the ``normal'' sections.  
 %
 %
+%\subsection{Headers and Footers}
+%\label{sec:ug_footers}
+%
+% \DescribeMacro{\evenfootmark}
+% \DescribeMacro{\oddfootmark}
+% Normally headers and footers are defined by the text.  However,
+% there is a possibility to change some of them.  Commands
+% \cs{evenfootmark}\marg{text} and \cs{oddfootmark} set the right and
+% left footers for even and odd pages correspondingly (the remaining
+% footers are used by the page numbers).  By default they are defined as
+% \begin{verbatim}
+% \evenfootmark{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}
+% \oddfootmark{\rightmark}
+% \end{verbatim}
+% The last command sets the footer to be the current section name (or
+% part name before the first section), but the user can change this.  
+%
 %
 %\subsection{Floats}
 %\label{sec:ug_floats}
@@ -1078,6 +1095,7 @@
 %   The actual icon change
 %    \begin{macrocode}
 \def\selecticon{\gdef\currenticon{\next@icon}}
+\def\next@icon{}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -1118,6 +1136,26 @@
 %\subsection{Page Styles}
 %\label{sec:pagestyles}
 %
+% \begin{macro}{\evenfootmark}
+% \changes{v1.3}{2013/12/14}{Introduced macro}
+%   The mark on even pages
+%    \begin{macrocode}
+\def\evenfootmark#1{\gdef\@evenfootmark{#1}}
+\evenfootmark{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\oddfootmark}
+% \changes{v1.3}{2013/12/14}{Introduced macro}
+%   The mark on odd pages
+%    \begin{macrocode}
+\def\oddfootmark#1{\gdef\@oddfootmark{#1}}
+\oddfootmark{\rightmark}
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+%
 % \begin{macro}{standardpagestyle}
 % \changes{v1.3}{2013/12/14}{Changed position of footers}
 %   This is our main page style
@@ -1141,13 +1179,13 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace*{25\p@}}%
+    \raisebox{-\height}{\@evenfootmark\hspace*{25\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
@@ -1191,13 +1229,13 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace{20\p@}}%
+    \raisebox{-\height}{\@evenfootmark\hspace{20\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
@@ -1205,6 +1243,19 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+% \begin{macro}{\fao@partblobtop}
+% \begin{macro}{\fao@partblobbottom}
+%   Some pages have ``part blobs'': colored blobs on the specific
+%   positions of the page.  These macros set the top and the bottom of
+%   the blob corresponding to the part set in the second parameter:
+%    \begin{macrocode}
+\def\fao@partblobtop#1#2{\expandafter\gdef\csname fao@blobstart#1\endcsname{#2}}
+\def\fao@partblobbottom#1#2{\expandafter\gdef\csname fao@blobend#1\endcsname{#2}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 %
 %\subsection{Nonfloats}
 %\label{sec:floats}
@@ -2026,18 +2077,19 @@
 % \end{macro}
 % 
 % \begin{macro}{\frontmatter}
-%   We want Roman numbers for front matter:
+%   We want Arabic numbers for front matter:
 %    \begin{macrocode}
-\def\frontmatter{\cleardoublepage
-  \pagenumbering{roman}\onecolumn\@mainmatterfalse}
+\def\frontmatter{\cleardoublepage\setbgcolor{gray}\selectcolor
+  \pagenumbering{roman}\pagestyle{standardpagestyle}%
+  \onecolumn\@mainmatterfalse}
 %    \end{macrocode}
 %   
 % \end{macro}
 % \begin{macro}{\mainmatter}
 %   We want Arabic numbers for main matter:
 %    \begin{macrocode}
-\def\mainmatter{\cleardoublepage\pagenumbering{arabic}\onecolumn
-  \pagestyle{standardpagestyle}%
+\def\mainmatter{\cleardoublepage\onecolumn
+  \pagenumbering{arabic}\pagestyle{standardpagestyle}%
   \@mainmattertrue}
 %    \end{macrocode}
 %   
@@ -2189,9 +2241,36 @@
 % \end{macro}
 % 
 % \begin{macro}{\@spart}
-%   We really do not use unnumbered parts
+%   Unnmumbered parts are only in the forewart
 %    \begin{macrocode}
-\def\@spart#1{\@part[#1]{#1}}
+\def\@spart#1{%
+  \clearspread
+  \onecolumn  
+  \clearspread
+  \selectcolor
+  \selecticon
+  \color{@bgcolor}%
+  \rowcolors{2}{@bgcolor!10}{}%
+  \pagestyle{partpagestyle}%
+  \phantomsection
+  \addcontentsline{toc}{spart}{\hspace{1em}#1}%
+   \def\@partpagepicture{%
+     \put(20,-500){\rotatebox{30}{\parbox{\textwidth}{%
+       \iconfill{1cm}{1.14\textwidth}{20}\\
+       \iconfill{1cm}{1.15\textwidth}{100}\\
+       \iconfill{1cm}{1.14\textwidth}{20}}}}}%
+   \markboth{#1}{#1}%
+   \null
+   \newpage
+   \def\@partpagepicture{\put(150,-150){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
+   \gdef\@partpagepicture{}}
+   {\interlinepenalty \@M
+     \vspace*{80\p@}
+     \captionfamily
+     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+       \raggedright\null#1\par}\par\vskip80\p@
+   }%
+\par}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2325,28 +2404,151 @@
 %
 % \begin{macro}{\tableofcontents}
 % \changes{v0.3}{2012/12/11}{Added macro}
+% \changes{v1.3}{2012/12/11}{Rewrote}
 %   Our table of contents
 %    \begin{macrocode}
-\renewcommand\tableofcontents{\@generictoc{\contentsname}{toc}}
+\renewcommand\tableofcontents{\clearspread
+  \@mkboth{\contentsname}{\contentsname}%
+  \makebox[0pt][l]{\fontsize{24pt}{32pt}\selectfont \bfseries
+    \color{black!70}\MakeUppercase{\contentsname}\space}%
+  \par\vspace{-2\baselineskip}\vspace{-\parskip}%
+  \@starttoc{toc}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\@tocpartskip}
+%   This is the skip between the parts in TOC:
+%    \begin{macrocode}
+\newlength{\@tocpartskip}
+\define@key{fao}{tocpartskip}{\setlength{\@tocpartskip}{#1}}
+\faoset{tocpartskip=\z@}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\@fao@tocrule@start}
+%   The start of the current TOC colored rule
+%    \begin{macrocode}
+\newdimen\@fao@tocrule@start
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% 
+% \begin{macro}{\@fao@tocrule@height}
+%   The height of the current TOC rule
+%    \begin{macrocode}
+\newdimen\@fao@tocrule@height
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\@draw@tocrule@part}
+%   Drawing the toc rule for a part
+%    \begin{macrocode}
+\def\@draw@tocrule@part{\@fao@tocrule@height=\pagetotal
+  \protected@write\@auxout{}{\string\fao@partblobbottom{\fao@currentpartnum}{\the\@fao@tocrule@height}}%  
+  \advance\@fao@tocrule@height-\@fao@tocrule@start
+  \bgroup\parskip\z@
+  \parbox[b][\z@]{\z@}{\hspace*{-15\p@}\color{@bgcolor}\rule{2\p@}{\@fao@tocrule@height}}%
+  \parbox[b][\z@]{\z@}{\hspace*{330\p@}%
+    \color{@bgcolor}\rule{41\p@}{\@fao@tocrule@height}}%
+  \par\vspace{-0.5\baselineskip}\egroup}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+% \begin{macro}{\@draw@tocrule@section}
+%   Drawing the toc rule for a section
+%    \begin{macrocode}
+\def\@draw@tocrule@section{\@fao@tocrule@height=\pagetotal
+  \protected@write\@auxout{}{\string\fao@partblobbottom{\fao@currentpartnum}{\the\@fao@tocrule@height}}%  
+  \advance\@fao@tocrule@height-\@fao@tocrule@start
+  \advance\@fao@tocrule@height5\p@
+  \bgroup\parskip\z@\small
+  \raisebox{\baselineskip}[\z@][\z@]{\parbox[b][\z@]{\z@}{\hspace*{-35\p@}\color{@bgcolor}\rule{2\p@}{\@fao@tocrule@height}}}%
+  \raisebox{\baselineskip}[\z@][\z@]{\parbox[b][\z@]{\z@}{\hspace*{310\p@}%
+      \color{@bgcolor}\rule{41\p@}{\@fao@tocrule@height}}}%
+  \par\vspace{-\baselineskip}\egroup}
 %    \end{macrocode}
 %   
 % \end{macro}
 %
 % \begin{macro}{\l@part}
-% \changes{v0.3}{2012/12/11}{Added macro}
-%   The way to put the part in the table of contents.  We do not want
-%   bold here
+%   This prints the part in TOC:
 %    \begin{macrocode}
 \renewcommand*\l@part[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
-    \addvspace{2.25em \@plus\p@}%
     \setlength\@tempdima{3em}%
+    \addvspace{\@tocpartskip}%
     \begingroup
+%    \end{macrocode}
+% We store the current vertical position of the page into
+% \cmd{\@fao@tocrule@start} 
+%    \begin{macrocode}
+%     \addvspace{-2pc}\par
+     \@fao@tocrule@start=\pagetotal
+     \protected@write\@auxout{}{\string\fao@partblobtop{\fao@currentpartnum}{\the\@fao@tocrule@start}}%
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      {\leavevmode\color{@bgcolor}%
-       \large  #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+      \leftskip180\p@
+      {\leavevmode
+       \color{@bgcolor}\bfseries\partname\space#1:
+       \hfil \hb@xt@\@pnumwidth{\hss #2}}%
+     \par\@draw@tocrule@part
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\l@spart}
+%   This adds unnumbered part to TOC
+%    \begin{macrocode}
+\newcommand*\l@spart[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+     \@fao@tocrule@start=\pagetotal
+     \protected@write\@auxout{}{\string\fao@partblobtop{\fao@currentpartnum}{\the\@fao@tocrule@start}}%
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leftskip180\p@
+      {\leavevmode
+       \color{@bgcolor}\bfseries#1:
+       \hfil \hb@xt@\@pnumwidth{\hss #2}}%
+     \par\@draw@tocrule@part
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+%    \end{macrocode}
+% 
+% \end{macro}
+%
+%
+% \begin{macro}{\l@section}
+%   This prints the section in TOC:
+%    \begin{macrocode}
+\renewcommand*\l@section[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \setlength\@tempdima{3em}%
+    \begingroup 
+    \small
+     \@fao@tocrule@start=\pagetotal
+     \leftskip200\p@\relax\parskip\z@
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode\small\strut
+       #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par\@draw@tocrule@section
        \nobreak
          \global\@nobreaktrue
          \everypar{\global\@nobreakfalse\everypar{}}%
@@ -2355,6 +2557,28 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+% \begin{macro}{\appendix}
+%   We do not draw colored rules in the TOC part of the appendix:
+%    \begin{macrocode}
+\renewcommand\appendix{%
+  \bookmarksetup{startatroot}%
+  \addtocontents{toc}{\string\let\string\@draw@tocrule@part\string\relax
+    \string\let\string\@draw@tocrule@section\string\relax}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% 
+% We use special formatting of metadata in the lists of\dots{} This
+% requires explicit |\pars| at the end:
+%    \begin{macrocode}
+\AtEndDocument{%
+  \immediate\write\@auxout{\string\@writefile{loc}{\string\par}}%
+  \immediate\write\@auxout{\string\@writefile{lot}{\string\par}}%
+  \immediate\write\@auxout{\string\@writefile{lom}{\string\par}}}
+%    \end{macrocode}
+% 
 %
 % \begin{macro}{\l@nonfloat}
 % \changes{v0.3}{2012/12/11}{Added macro}
@@ -2433,7 +2657,8 @@
 %\label{sec:final}
 %
 %    \begin{macrocode}
-\setbgcolor{white}
+\setbgcolor{gray}\selectcolor
+\pagestyle{standardpagestyle}
 \normalsize\normalfont
 %</class>      
 %    \end{macrocode}

@@ -171,11 +171,16 @@
 \def\seticon#1{\gdef\next@icon{#1}}
 \define@key{fao}{icon}{\seticon{#1}}
 \def\selecticon{\gdef\currenticon{\next@icon}}
+\def\next@icon{}
 \def\newicon#1#2{\expandafter\gdef\csname @icon@#1\endcsname{#2}}
 \newcommand\colored@icon[2][]{\bgroup\fboxsep=-1pt%
   \fcolorbox{white}{@bgcolor}{\includegraphics[#1]{#2}}\egroup}
 \newcommand\colored@icon@fg[3][]{\bgroup\fboxsep=-1\p@%
   \fcolorbox{white}{@bgcolor!#3}{\includegraphics[#1]{#2}}\egroup}
+\def\evenfootmark#1{\gdef\@evenfootmark{#1}}
+\evenfootmark{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}
+\def\oddfootmark#1{\gdef\@oddfootmark{#1}}
+\oddfootmark{\rightmark}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
   \fancyhfoffset[LR]{2.22cm}%
@@ -195,13 +200,13 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace*{25\p@}}%
+    \raisebox{-\height}{\@evenfootmark\hspace*{25\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
@@ -227,17 +232,19 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
-    \raisebox{-\height}{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}\hspace{20\p@}}%
+    \raisebox{-\height}{\@evenfootmark\hspace{20\p@}}%
   \egroup}%
   \fancyfoot[LO]{
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\hspace*{25\p@}\rightmark}%
+    \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
   \egroup}%
 }
+\def\fao@partblobtop#1#2{\expandafter\gdef\csname fao@blobstart#1\endcsname{#2}}
+\def\fao@partblobbottom#1#2{\expandafter\gdef\csname fao@blobend#1\endcsname{#2}}
 \gdef\@toc@ext@list{toc}
 \newlength\nf@vert@sep
 \setlength\nf@vert@sep{30pt}
@@ -646,10 +653,11 @@
   \null\vfill\clearpage\fi
 \fi}
 \newif\if@mainmatter
-\def\frontmatter{\cleardoublepage
-  \pagenumbering{roman}\onecolumn\@mainmatterfalse}
-\def\mainmatter{\cleardoublepage\pagenumbering{arabic}\onecolumn
-  \pagestyle{standardpagestyle}%
+\def\frontmatter{\cleardoublepage\setbgcolor{gray}\selectcolor
+  \pagenumbering{roman}\pagestyle{standardpagestyle}%
+  \onecolumn\@mainmatterfalse}
+\def\mainmatter{\cleardoublepage\onecolumn
+  \pagenumbering{arabic}\pagestyle{standardpagestyle}%
   \@mainmattertrue}
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{-1}
@@ -719,7 +727,34 @@
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
       \raggedright\null#2\par}\par\vskip80\p@
   }\par}
-\def\@spart#1{\@part[#1]{#1}}
+\def\@spart#1{%
+  \clearspread
+  \onecolumn
+  \clearspread
+  \selectcolor
+  \selecticon
+  \color{@bgcolor}%
+  \rowcolors{2}{@bgcolor!10}{}%
+  \pagestyle{partpagestyle}%
+  \phantomsection
+  \addcontentsline{toc}{spart}{\hspace{1em}#1}%
+   \def\@partpagepicture{%
+     \put(20,-500){\rotatebox{30}{\parbox{\textwidth}{%
+       \iconfill{1cm}{1.14\textwidth}{20}\\
+       \iconfill{1cm}{1.15\textwidth}{100}\\
+       \iconfill{1cm}{1.14\textwidth}{20}}}}}%
+   \markboth{#1}{#1}%
+   \null
+   \newpage
+   \def\@partpagepicture{\put(150,-150){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
+   \gdef\@partpagepicture{}}
+   {\interlinepenalty \@M
+     \vspace*{80\p@}
+     \captionfamily
+     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
+       \raggedright\null#1\par}\par\vskip80\p@
+   }%
+\par}
 \def\sectionmark#1{\markright{#1}}
 \renewcommand\section{\par\clearspread
   \@startsection {section}{1}{\z@}%
@@ -763,22 +798,98 @@
   {\fontsize{48pt}{48pt}\selectfont
     \captionfamily\color{black!40}#1\par}\@mkboth{#1}{#1}\bigskip
   \@starttoc{#2}}
-\renewcommand\tableofcontents{\@generictoc{\contentsname}{toc}}
+\renewcommand\tableofcontents{\clearspread
+  \@mkboth{\contentsname}{\contentsname}%
+  \makebox[0pt][l]{\fontsize{24pt}{32pt}\selectfont \bfseries
+    \color{black!70}\MakeUppercase{\contentsname}\space}%
+  \par\vspace{-2\baselineskip}\vspace{-\parskip}%
+  \@starttoc{toc}}
+\newlength{\@tocpartskip}
+\define@key{fao}{tocpartskip}{\setlength{\@tocpartskip}{#1}}
+\faoset{tocpartskip=\z@}
+\newdimen\@fao@tocrule@start
+\newdimen\@fao@tocrule@height
+\def\@draw@tocrule@part{\@fao@tocrule@height=\pagetotal
+  \protected@write\@auxout{}{\string\fao@partblobbottom{\fao@currentpartnum}{\the\@fao@tocrule@height}}%
+  \advance\@fao@tocrule@height-\@fao@tocrule@start
+  \bgroup\parskip\z@
+  \parbox[b][\z@]{\z@}{\hspace*{-15\p@}\color{@bgcolor}\rule{2\p@}{\@fao@tocrule@height}}%
+  \parbox[b][\z@]{\z@}{\hspace*{330\p@}%
+    \color{@bgcolor}\rule{41\p@}{\@fao@tocrule@height}}%
+  \par\vspace{-0.5\baselineskip}\egroup}
+\def\@draw@tocrule@section{\@fao@tocrule@height=\pagetotal
+  \protected@write\@auxout{}{\string\fao@partblobbottom{\fao@currentpartnum}{\the\@fao@tocrule@height}}%
+  \advance\@fao@tocrule@height-\@fao@tocrule@start
+  \advance\@fao@tocrule@height5\p@
+  \bgroup\parskip\z@\small
+  \raisebox{\baselineskip}[\z@][\z@]{\parbox[b][\z@]{\z@}{\hspace*{-35\p@}\color{@bgcolor}\rule{2\p@}{\@fao@tocrule@height}}}%
+  \raisebox{\baselineskip}[\z@][\z@]{\parbox[b][\z@]{\z@}{\hspace*{310\p@}%
+      \color{@bgcolor}\rule{41\p@}{\@fao@tocrule@height}}}%
+  \par\vspace{-\baselineskip}\egroup}
 \renewcommand*\l@part[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
-    \addvspace{2.25em \@plus\p@}%
     \setlength\@tempdima{3em}%
+    \addvspace{\@tocpartskip}%
     \begingroup
+     \@fao@tocrule@start=\pagetotal
+     \protected@write\@auxout{}{\string\fao@partblobtop{\fao@currentpartnum}{\the\@fao@tocrule@start}}%
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      {\leavevmode\color{@bgcolor}%
-       \large  #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par
+      \leftskip180\p@
+      {\leavevmode
+       \color{@bgcolor}\bfseries\partname\space#1:
+       \hfil \hb@xt@\@pnumwidth{\hss #2}}%
+     \par\@draw@tocrule@part
        \nobreak
          \global\@nobreaktrue
          \everypar{\global\@nobreakfalse\everypar{}}%
     \endgroup
   \fi}
+\newcommand*\l@spart[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+     \@fao@tocrule@start=\pagetotal
+     \protected@write\@auxout{}{\string\fao@partblobtop{\fao@currentpartnum}{\the\@fao@tocrule@start}}%
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leftskip180\p@
+      {\leavevmode
+       \color{@bgcolor}\bfseries#1:
+       \hfil \hb@xt@\@pnumwidth{\hss #2}}%
+     \par\@draw@tocrule@part
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+\renewcommand*\l@section[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+    \small
+     \@fao@tocrule@start=\pagetotal
+     \leftskip200\p@\relax\parskip\z@
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode\small\strut
+       #1\hfil \hb@xt@\@pnumwidth{\hss #2}}\par\@draw@tocrule@section
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+\renewcommand\appendix{%
+  \bookmarksetup{startatroot}%
+  \addtocontents{toc}{\string\let\string\@draw@tocrule@part\string\relax
+    \string\let\string\@draw@tocrule@section\string\relax}}
+\AtEndDocument{%
+  \immediate\write\@auxout{\string\@writefile{loc}{\string\par}}%
+  \immediate\write\@auxout{\string\@writefile{lot}{\string\par}}%
+  \immediate\write\@auxout{\string\@writefile{lom}{\string\par}}}
 \newcommand*\l@nonfloat{\@dottedtocline{1}{\z@}{2.3em}}
 \def\numberline#1{%
   \raisebox{\z@}[\z@][\z@]{%
@@ -790,7 +901,8 @@
 \let\l@table\l@nonfloat
 \newcommand\listofcharts{\@generictoc{\listofchartsname}{loc}}
 \let\l@chart\l@nonfloat
-\setbgcolor{white}
+\setbgcolor{gray}\selectcolor
+\pagestyle{standardpagestyle}
 \normalsize\normalfont
 \endinput
 %%
