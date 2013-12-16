@@ -15,7 +15,7 @@
 \part*{Foreword}
 \lipsum
 
-\part*{Acknowledgements}
+\part*{Ack\-now\-ledgements}
 \lipsum
 
 \part*{How to use this book}
@@ -38,6 +38,7 @@
 \label{map:roma}
 \includegraphics[width=\chartwidth,height=\chartheight]{Rome}
 \source{Wikipedia}
+\refMetadata{agripop}
 \end{map}
 
 \begin{map}{S}{ur}
@@ -75,6 +76,7 @@
 \label{chart:incarceration}
 \includegraphics[width=\chartwidth,height=\chartheight]{incarceration}  
 \source{Wikipedia}
+\refMetadata{agripop}
 \end{chart}
 
 \section{Economy}
@@ -185,7 +187,6 @@
 \lipsum
 
 
-% if insteas i put a wide chart W, or nothing, "Input" is displayed on the top
 
 
 
@@ -197,6 +198,23 @@
 \clearpage
 \input{T_P2.HE.1}
 \end{tablepages}
+
+
+\metadatasection{Indicators}
+
+\begin{metadata}{Agricultural population}
+
+\key{agripop}
+Agricultural population is defined as all persons depending for their livelihood on agriculture, hunting, fishing and forestry. It comprises all persons economically active in agriculture as well as their non-working dependents. It is not necessary that this referred population exclusively come from rural population.
+\source{\href{http://www.fao.org/economic/ess/en/}{Statistics
+    Division} (\href{http://faostat.fao.org}{FAOSTAT})} 
+\owner{\href{http://www.fao.org}{FAO}} 
+\end{metadata}
+
+
+\begin{metadata}{Core}
+  \lipsum[1]
+\end{metadata}
 
 \faoset{bgcolor=orange,icon=icons/hunger}
 \part{Hunger Dimensions}
@@ -222,6 +240,8 @@
 \includegraphics[width=\chartwidth,height=\chartheight]{Rome}
 \source{Wikipedia}
 \end{map}
+
+
 
 \end{document}
 

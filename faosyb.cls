@@ -901,6 +901,91 @@
 \let\l@table\l@nonfloat
 \newcommand\listofcharts{\@generictoc{\listofchartsname}{loc}}
 \let\l@chart\l@nonfloat
+\newcommand\metadatasection[1]{\clearspread\twocolumn\normalcolor
+  \section{#1}}
+\def\metadata#1{\bgroup
+      \def\meta@key{@@@@}%
+    \def\key##1{\NR@gettitle{##1}\phantomsection\label{##1}%
+      \gdef\meta@key{##1}}
+    \def\source##1{\emph{Source: }##1. }%
+    \def\owner##1{\emph{Owner: }##1. }%
+  \begin{list}{}{\topsep8\p@\labelwidth\z@
+      \labelsep\z@\itemindent\z@\parsep0.4ex plus 0.5ex minus
+      0.2ex\relax\listparindent\z@\leftmargin\z@\rightmargin\z@
+    \partopsep\z@}%
+  \item{\bfseries\textbullet~#1\par\penalty10000}}
+\def\endmetadata{%
+  \expandafter\ifx\csname
+     metaback@\meta@key\endcsname\relax
+  \else
+    \emph{Referenced in: }
+    \csname metaback@\meta@key\endcsname
+  \fi
+  \end{list}\egroup}
+\def\refMetadata#1{%
+  \ifx\@captype\@undefined\def\@captype{table}\fi
+    \if@filesw
+      \immediate\write\@mainaux{%
+        \string\fao@metaback{#1}{\@captype}{\csname the\@captype\endcsname}{\thepage}{\@currentHref}}%
+    \fi
+}
+\def\fao@metaback#1#2#3#4#5{%
+  \expandafter\ifx\csname metaback@#1\endcsname\relax
+    \expandafter\gdef\csname metaback@#1\endcsname{%
+    \hyper@linkstart{link}{#5}#2~#3\hyper@linkend}%
+  \else
+    \expandafter\g@addto@macro\csname metaback@#1\endcsname{,
+    \hyper@linkstart{link}{#5}#2~#3\hyper@linkend}%
+  \fi}
+\def\fitemize{%
+  \ifnum \@itemdepth >\thr@@\@toodeep\else
+    \advance\@itemdepth\@ne
+    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+    \expandafter
+    \list
+      \csname\@itemitem\endcsname
+      {\def\makelabel##1{\color{@bgcolor}{##1}\space}%
+        \itemsep\z@\labelwidth\z@
+        \leftmargin\z@\labelsep\z@}%
+  \fi}
+\let\endfitemize =\endlist
+\newenvironment{freading}{%
+  \vfill\section*{Further reading}\par
+  \vspace{-\baselineskip}{\color{@bgcolor}{\rule{\columnwidth}{1.5pt}}}\par
+  \vspace{-\baselineskip}\bgroup
+  \let\itemize=\fitemize
+  \let\enditemize=\endfitemize}{\egroup}
+\newlength{\@publicationskip}
+\define@key{fao}{publicationskip}{\setlength{\@publicationskip}{#1}}
+\faoset{publicationskip=6pt plus 2pt minus 2pt}
+\newlength{\@publicationparskip}
+\define@key{fao}{publicationparskip}{\setlength{\@publicationparskip}{#1}}
+\faoset{publicationparskip=6pt plus 6pt minus 4pt}
+\newenvironment{publication}[2][]{%
+  \par{\bfseries#2\par}\begin{minipage}[t]{0.49\columnwidth}%
+    \setlength\parskip{\@publicationparskip}%
+    \gdef\@pub@cover{#1}%
+    \long\def\pDescription##1{\par##1\par}%
+    \def\pEdition##1##2{\par##1: ##2\par}%
+    \def\pCycle##1{\par Publication cycle: ##1\par}%
+    \def\pWeb##1{\par \raggedright Webpage: \url{##1}\par}}%
+  {\end{minipage}%
+  \ifx\@pub@cover\@empty\else
+  \hspace{0.1\columnwidth}%
+  \raisebox{\dimexpr\baselineskip-\totalheight}{%
+    \includegraphics[width=0.4\columnwidth]{\@pub@cover}}\fi\par
+  \vspace{\@publicationskip}}
+\DeclareRobustCommand*\textsubscript[1]{%
+  \@textsubscript{\selectfont#1}}
+\def\@textsubscript#1{%
+  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
 \setbgcolor{gray}\selectcolor
 \pagestyle{standardpagestyle}
 \normalsize\normalfont

@@ -562,6 +562,8 @@
 % \end{verbatim}
 % Note that, as in the example, some fields may be repeated.  
 %
+% \DescribeMacro{publicationparskip}
+% \DescribeMacro{publicationskip}
 % Two spacing parameters can be used for typesetting of publications:
 % |publicationskip| is the amount of additional space between the publications,
 % while |publicationparskip| is the space between the paragraphs
@@ -577,16 +579,22 @@
 %\subsection{Metadata}
 %\label{sec:ug_metadata}
 %
-% \DescribeEnv{MetadataCollection}
+% \DescribeMacro{\metadatasection}
+% The sources of the data are collected in special sections called
+% ``Metadata section''.  Each section is introduced by the command
+% \cs{metadatasection}\marg{title}, for example,
+% \begin{verbatim}
+% \metdatasection{Indicators}
+% \end{verbatim}
+% 
+%
 % \DescribeEnv{metadata}
-% Each chart, map of table in the book has a \emph{source}.  Soruces
-% are collected in the environemnt |MetadataCollection|, which consists
-% of separate
-% |metadata| environments.  Each |metadata| environment  has two obligatory
-% arguments---the name of the source and the key.  The key is used to
-% identify the metadata in the charts, maps, tables and other
-% objects.  The environment may include other commands.
+% The sources themselves are collected in the
+% |metadata| environments.  Each environment has one obligatory
+% argument---the name of the source.  It may include the following commands:
 % \begin{description}
+% \item[\cmd{\key}\marg{key}]\DescribeMacro{\key} sets the 
+%   corresponding key which is used for labeling the metadata
 % \item[\cmd{\source}\marg{source}]\DescribeMacro{\source} sets the
 % source of the data.
 % \item[\cmd{\owner}\marg{owner}]\DescribeMacro{\owner} sets the owner
@@ -598,77 +606,33 @@
 %
 % Example of the usage of these commands:
 % \begin{verbatim}
-% \begin{MetadataCollection}
-% \begin{metadata}{Agricultural population}{P1.DEM.FAO.POP.AGR} 
-% 
+% \metadatasection{Indicators}
+% \begin{metadata}{Agricultural population} 
+%   \key{agripop}%
 %    Agricultural population is defined as all persons depending for
 %    their livelihood on agriculture, hunting, fishing and forestry.
 %    It comprises all persons economically active in agriculture as
 %    well as their non-working dependents. It is not necessary that
 %    this referred population exclusively come from rural population.
-%
 %    \source{FILL ME}
 %    \owner{FILL ME}
 % \end{metadata}
-% \end{MetadataCollection}
 % \end{verbatim}
 %
 % \DescribeMacro{\refMetadata}
 % The metadata is referenced by the command
 % \cmd{\refMetdata}\marg{key}, for example
 % \begin{verbatim}
-% \refMetadata{P1.DEM.FAO.POP.AGR}
+% \refMetadata{agripop}
 % \end{verbatim}
-% This command will be typset as
-% \begin{quote}
-%   Source: Agricultural population, page NNNN.
-% \end{quote}
-% This command must \emph{not} occur in the caption of the chart, map
-% or table.
+% This command will not be typeset, but makes creates a backreference
+% to the corresponding chart from the indicator section.
 %
 %
 % Note that the package automatically provides backreferencing: all
 % charts, maps and tables where the medatada is referenced, are
 % mentioned in the corresponding metadata section.
 %
-% The sources of each chart, map or table can be shown in the lists of
-% charts, tables, maps or not.  The key |metadataInLists| (by default
-% |false|) determines whether they are shown there.  To make them
-% visible, put before the lists
-% \begin{verbatim}
-% \faosetup{metadataInLists=true}
-% \end{verbatim}
-% 
-%
-%
-%
-%\subsection{Concepts and Methods}
-%\label{sec:ug_concepts}
-% 
-% \DescribeEnv{ConceptsAndMethods}
-% The environment |ConceptsAndMethods| starts a new section ``Concepts
-% and Methods''.
-% Concepts and methods are collected in the series of |concept|
-% environments. Each environment has one obligatory field: the name of
-% the concept, for example:
-% \begin{verbatim}
-% \begin{ConceptsAndMethods}
-%   \begin{concept}{Gross domestic product}
-%     Gross domestic product (GDP) is the market value of all officially
-%     recognized final goods and services produced within a country in a
-%     given period of time. 
-%   \end{concept}
-%   \begin{concept}{Gross state product}
-%     Gross state product (GSP), or gross regional product (GRP), is a
-%     measurement of the economic output of a state or province (i.e.,
-%     of a subnational entity). It is the sum of all value added by
-%     industries within the state and serves as a counterpart to the
-%     gross domestic product (GDP). 
-%   \end{concept}
-% \end{ConceptsAndMethods}
-% \end{verbatim}
-% 
-% 
 %
 %\subsection{Further Reading}
 %\label{sec:ug_further_reading}
@@ -2652,6 +2616,234 @@
 %    \end{macrocode}
 %   
 % \end{macro}
+%
+%\subsection{Metadata}
+%\label{sec:metadata}
+% \changes{v1.3}{2013/12/14}{Added metadata from the old code}
+%
+% \begin{macro}{\metadatasection}
+% \changes{v1.3}{2013/12/14}{Added macro}
+%   The section for metadata:
+%    \begin{macrocode}
+\newcommand\metadatasection[1]{\clearspread\twocolumn\normalcolor
+  \section{#1}} 
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\metadata}
+% \changes{v1.3}{2013/12/14}{Rewrote}
+%   This starts the metadata section.  The commands inside are local
+%   to the metadata.
+%    \begin{macrocode}
+\def\metadata#1{\bgroup
+      \def\meta@key{@@@@}%
+%    \end{macrocode}
+% Now we define the commands for metadata:
+% \begin{macro}{\key}
+%   This sets the key:
+%    \begin{macrocode}
+    \def\key##1{\NR@gettitle{##1}\phantomsection\label{##1}%
+      \gdef\meta@key{##1}}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\source}
+%   This typesets the source:
+%    \begin{macrocode}
+    \def\source##1{\emph{Source: }##1. }%
+%    \end{macrocode}   
+% \end{macro}
+% \begin{macro}{\owner}
+%   This typesets the owner:
+%    \begin{macrocode}
+    \def\owner##1{\emph{Owner: }##1. }%
+%    \end{macrocode}   
+% \end{macro}
+%
+%
+%     \begin{macrocode}
+  \begin{list}{}{\topsep8\p@\labelwidth\z@
+      \labelsep\z@\itemindent\z@\parsep0.4ex plus 0.5ex minus
+      0.2ex\relax\listparindent\z@\leftmargin\z@\rightmargin\z@
+    \partopsep\z@}%
+  \item{\bfseries\textbullet~#1\par\penalty10000}}      
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\endmetadata}
+%   This closes the environment:
+%    \begin{macrocode}
+\def\endmetadata{%
+  \expandafter\ifx\csname
+     metaback@\meta@key\endcsname\relax
+  \else
+    \emph{Referenced in: }
+    \csname metaback@\meta@key\endcsname
+  \fi
+  \end{list}\egroup}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\refMetadata}
+%   The way we actually reference the metadata:
+%    \begin{macrocode}
+\def\refMetadata#1{%
+  \ifx\@captype\@undefined\def\@captype{table}\fi
+    \if@filesw
+      \immediate\write\@mainaux{%
+        \string\fao@metaback{#1}{\@captype}{\csname the\@captype\endcsname}{\thepage}{\@currentHref}}%
+    \fi
+}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\fao@metaback}
+%   This reads the backreferences to metadata and prepares the the
+%   list.  The arguments are: key, float type, number of float, page
+%   and hyperref
+%    \begin{macrocode}
+\def\fao@metaback#1#2#3#4#5{%
+  \expandafter\ifx\csname metaback@#1\endcsname\relax
+    \expandafter\gdef\csname metaback@#1\endcsname{%
+    \hyper@linkstart{link}{#5}#2~#3\hyper@linkend}%
+  \else
+    \expandafter\g@addto@macro\csname metaback@#1\endcsname{, 
+    \hyper@linkstart{link}{#5}#2~#3\hyper@linkend}%
+  \fi}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+%
+%\subsection{Further Reading}
+%\label{sec:freading}
+%
+% \changes{v1.3}{2013/12/14}{Added Further Reading from the old code}
+%
+% \begin{macro}{\fitemize}
+%   This is the special version of |itemize| for further reading
+%   pages.  Basically it is a patched kernel version.
+%    \begin{macrocode}
+\def\fitemize{%
+  \ifnum \@itemdepth >\thr@@\@toodeep\else
+    \advance\@itemdepth\@ne
+    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+    \expandafter
+    \list
+      \csname\@itemitem\endcsname
+      {\def\makelabel##1{\color{@bgcolor}{##1}\space}%
+        \itemsep\z@\labelwidth\z@
+        \leftmargin\z@\labelsep\z@}%
+  \fi}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\endfitemize}
+%   This is standard:
+%    \begin{macrocode}
+\let\endfitemize =\endlist
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+%
+% \begin{macro}{\freading}
+%   This is the ``Further Reading environment''
+%    \begin{macrocode}
+\newenvironment{freading}{%
+  \vfill\section*{Further reading}\par
+  \vspace{-\baselineskip}{\color{@bgcolor}{\rule{\columnwidth}{1.5pt}}}\par
+  \vspace{-\baselineskip}\bgroup
+  \let\itemize=\fitemize
+  \let\enditemize=\endfitemize}{\egroup}
+%    \end{macrocode}
+%   
+% \end{macro}
+% 
+%   
+% 
+%
+%\subsection{Publications}
+%\label{sec:publications}
+%
+% \changes{v1.3}{2013/12/14}{Added Pubs from the old code}
+%
+% \begin{macro}{\@publicationskip}
+%   Skip between the publications.  By default \cmd{\medskip}:
+%    \begin{macrocode}
+\newlength{\@publicationskip}
+\define@key{fao}{publicationskip}{\setlength{\@publicationskip}{#1}}
+\faoset{publicationskip=6pt plus 2pt minus 2pt}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@publicationparskip}
+%   Paragraph skip between the publications.
+%    \begin{macrocode}
+\newlength{\@publicationparskip}
+\define@key{fao}{publicationparskip}{\setlength{\@publicationparskip}{#1}}
+\faoset{publicationparskip=6pt plus 6pt minus 4pt}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\publication}
+%   This typesets one publication:
+%    \begin{macrocode}
+\newenvironment{publication}[2][]{%
+  \par{\bfseries#2\par}\begin{minipage}[t]{0.49\columnwidth}%
+    \setlength\parskip{\@publicationparskip}%
+    \gdef\@pub@cover{#1}%
+    \long\def\pDescription##1{\par##1\par}%
+    \def\pEdition##1##2{\par##1: ##2\par}%
+    \def\pCycle##1{\par Publication cycle: ##1\par}%
+    \def\pWeb##1{\par \raggedright Webpage: \url{##1}\par}}%
+  {\end{minipage}%
+  \ifx\@pub@cover\@empty\else
+  \hspace{0.1\columnwidth}%
+  \raisebox{\dimexpr\baselineskip-\totalheight}{%
+    \includegraphics[width=0.4\columnwidth]{\@pub@cover}}\fi\par
+  \vspace{\@publicationskip}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%\subsection{Subscripts}
+%\label{sec:subscripts}
+%
+% \begin{macro}{\textsubscript}
+%   This follows standard \LaTeX:
+%    \begin{macrocode}
+\DeclareRobustCommand*\textsubscript[1]{%
+  \@textsubscript{\selectfont#1}}
+\def\@textsubscript#1{%
+  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+%    \end{macrocode}
+% 
+% \end{macro}
+%
+%
+%
+%\subsection{LyX code}
+%\label{sec:lyx}
+% 
+% \begin{macro}{\lyxlist}
+% It seems Lyx wants this:
+%    \begin{macrocode}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%
+%
 %
 % \subsection{The final word}
 %\label{sec:final}
