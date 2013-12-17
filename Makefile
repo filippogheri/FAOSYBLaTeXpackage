@@ -1,7 +1,7 @@
 
 PACKAGE=faosyb
 
-SAMPLES = faosample.tex
+SAMPLES = faosample.tex faosample2.tex
 
 WD = $(shell pwd)
 CURRDIR = $(notdir ${WD})
@@ -34,6 +34,7 @@ all:  ${PDF}
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $*.log) \
 	do pdflatex $<; done
 
+faosample2.pdf: part1.tex
 
 
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls

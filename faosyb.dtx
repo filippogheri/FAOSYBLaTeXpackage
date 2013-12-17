@@ -37,7 +37,7 @@
 \ProvidesFile{faosyb.dtx}
 %</gobble>
 %<class>\ProvidesClass{faosyb}
-[2013/12/15 v1.2 Typesetting FAO Yearbook]
+[2013/12/16 v1.3 Typesetting FAO Yearbook]
 %<*gobble>
 %    \end{macrocode}
 %
@@ -1895,6 +1895,7 @@
 %
 %
 % \begin{macro}{\nf@opcol}
+% \changes{v1.3}{2013/12/16}{Typo corrected}
 %   This is like the standard \LaTeX\ \cs{@outputdblcol}, but with the
 %   treatment of wide nonfloats.
 %    \begin{macrocode}
@@ -1924,7 +1925,7 @@
     \egroup
     \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
       \setbox\@tempboxa\vsplit \curr@nfbox@W@ll to 0.5\textheight
-      \setbox\@ouputbox\vbox\bgroup
+      \setbox\@outputbox\vbox\bgroup
         \box\@outputbox
         \nointerlineskip
         \box\@tempboxa
@@ -2108,9 +2109,10 @@
 % \begin{macro}{\EndPartIntro}
 % \changes{v0.2}{2013/12/10}{Deleted \cs{clearspread}}
 % \changes{v0.3}{2013/12/11}{Restored \cs{clearspread}}
+% \changes{v1.3}{2013/12/16}{Added \cs{normalcolor}}
 %   This command switches off the  special formatting of part pages:
 %    \begin{macrocode}
-\def\EndPartIntro{\clearspread\twocolumn
+\def\EndPartIntro{\clearspread\twocolumn\normalcolor
   \pagestyle{standardpagestyle}}
 %    \end{macrocode}
 %   

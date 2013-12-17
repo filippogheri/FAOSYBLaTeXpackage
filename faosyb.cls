@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/15 v1.2 Typesetting FAO Yearbook]
+[2013/12/16 v1.3 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -594,7 +594,7 @@
     \egroup
     \ifdim\ht\curr@nfbox@W@ll>0.5\baselineskip
       \setbox\@tempboxa\vsplit \curr@nfbox@W@ll to 0.5\textheight
-      \setbox\@ouputbox\vbox\bgroup
+      \setbox\@outputbox\vbox\bgroup
         \box\@outputbox
         \nointerlineskip
         \box\@tempboxa
@@ -667,7 +667,7 @@
 \def\fao@currentpartnum{0}
 \renewcommand\part{%
   \secdef\@part\@spart}
-\def\EndPartIntro{\clearspread\twocolumn
+\def\EndPartIntro{\clearspread\twocolumn\normalcolor
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
 \def\iconfill#1#2#3{%
