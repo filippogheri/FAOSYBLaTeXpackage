@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/16 v1.3 Typesetting FAO Yearbook]
+[2013/12/17 v1.4 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -728,7 +728,7 @@
     \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
       \raggedright\null#2\par}\par\vskip80\p@
-  }\par}
+  }\par\normalcolor}
 \define@choicekey*+{fao}{symbol}[\val\nr]%
 {righttriangle,square,rightsemicircle}{%
   \ifcase\nr\relax

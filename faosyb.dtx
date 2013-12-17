@@ -37,7 +37,7 @@
 \ProvidesFile{faosyb.dtx}
 %</gobble>
 %<class>\ProvidesClass{faosyb}
-[2013/12/16 v1.3 Typesetting FAO Yearbook]
+[2013/12/17 v1.4 Typesetting FAO Yearbook]
 %<*gobble>
 %    \end{macrocode}
 %
@@ -2199,6 +2199,7 @@
 % \begin{macro}{\@part}
 % \changes{v0.2}{2013/12/03}{Changed formatting}
 % \changes{v1.3}{2013/12/14}{Changed the way the icons are displayed}
+% \changes{v1.4}{2013/12/17}{Text is now black}
 %   This is the actual part making macro.
 %    \begin{macrocode}
 \def\@part[#1]#2{%
@@ -2231,7 +2232,7 @@
     \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
       \raggedright\null#2\par}\par\vskip80\p@
-  }\par}
+  }\par\normalcolor}
 %    \end{macrocode}
 % \end{macro}
 % 
