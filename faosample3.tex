@@ -1,0 +1,175 @@
+\documentclass[print,Draft]{faosyb}
+\usepackage{lipsum}
+\faoset{year=2013}
+\usepackage{pdfpages}
+
+%% Define new commands
+%\input{./NewCommands.tex}
+
+%% Define colors %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{for}{cmyk}{80,0,20,0}
+\definecolor{ack}{cmyk}{80,0,20,0}
+
+% Define chapter colors
+\definecolor{part1}{cmyk}{0.90,0.40,0.24,0.32}
+\definecolor{part2}{cmyk}{0,0.54,0.96,0.10}
+\definecolor{part3}{cmyk}{0.18,0.90,0.75,0.31}
+\definecolor{part4}{cmyk}{0.73,0.10,0.97,0.29}
+\definecolor{part5}{cmyk}{0,0,0,0.5}
+
+
+%% Begin Document %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% To make odd pages even and even pages odd
+\addtocounter{page}{1}  
+
+\mainmatter
+\input{TitlePage.tex}
+
+%% Disclaimer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\includepdf[pages={1}]{DefaultDisclaimer.pdf}
+
+%% Foreward, Acknowledgements, How to use this book  %%%%%%%%%%
+
+\faoset{symbol=righttriangle,bgcolor=orange}
+\part*{Foreword}
+\lettrine{T}{his} is a foreword
+\lipsum[1-6]
+
+\faoset{symbol=square,bgcolor=ack}
+\part*{Acknowledgements}
+\lettrine{T}{his} is acknowledgements.
+\lipsum[1-5]
+
+\faoset{symbol=rightsemicircle,bgcolor=blue}
+\part*{How to use this book}
+\input{Howtouse.tex}
+
+%% Table contents, charts, maps, tables
+
+\tableofcontents
+\listofcharts
+\listofmaps
+\listoftables
+
+
+%%%%%%%%%%%%%%  PART 1: The Setting %%%%%%%%%%%%%
+
+\faoset{bgcolor=part1,icon=icons/settings}
+\part[The Setting]{The\\ Setting}
+\lipsum
+\EndPartIntro
+
+\input{chapter1.tex}
+
+%% Tables chapter 1 %%%%%%%%%%%%%
+
+\section{}
+\begin{tablepages}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%  PART 2: Hunger Dimensions %%%%%%%%%%
+
+\faoset{bgcolor=part2,icon=icons/hunger}
+\part{Hunger Dimensions}
+\lipsum
+\EndPartIntro
+
+\input{chapter2.tex}
+
+%% Tables chapter 2 %%%%%%%%%%%%%
+
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%  PART 3: Feeding the world %%%%%%%%%%%
+
+\faoset{bgcolor=part3,icon=icons/feeding}
+\part[Feeding the world]{Feeding\\ the world}
+\lipsum
+\EndPartIntro
+
+\input{chapter3.tex}
+
+%% Tables chapter 3 %%%%%%%%%%%%%
+
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%  PART 4: Sustainability Dimensions %%%%%%%%
+
+\faoset{bgcolor=part4,icon=icons/sustainability}
+\part[Sustainability dimensions]{Sustain\-ability dimensions}
+\lipsum
+\EndPartIntro
+
+\input{chapter4.tex}
+
+%% Tables chapter 4 %%%%%%%%%%%%%
+
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%% METADATA %%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=gray}
+%\faoset{bgcolor=black}
+
+\part{Metadata}
+
+\metadatasection{Indicators}
+
+\begin{metadata}{Agricultural population}
+
+\key{agripop}
+Agricultural population is defined as all persons depending for their livelihood on agriculture, hunting, fishing and forestry. It comprises all persons economically active in agriculture as well as their non-working dependents. It is not necessary that this referred population exclusively come from rural population.
+\source{\href{http://www.fao.org/economic/ess/en/}{Statistics
+    Division} (\href{http://faostat.fao.org}{FAOSTAT})} 
+\owner{\href{http://www.fao.org}{FAO}} 
+\end{metadata}
+
+\begin{metadata}{Core}
+  \lipsum[1]
+\end{metadata}
+
+
+%%%% Bibliography
+
+\addcontentsline{toc}{section}{Bibliography}
+\newpage
+\input{nocite.tex}
+\onecolumn
+\bibliographystyle{faobibstyle}
+\bibliography{SYB2013refs}
+\clearpage
+
+%%%% End Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
