@@ -48,7 +48,7 @@
 \RequirePackage[authoryear]{natbib}
 \RequirePackage[breaklinks]{hyperref}
 \RequirePackage{bookmark}
-\RequirePackage{adjmulticol}
+\RequirePackage{adjmulticol,lettrine}
 \if@issuumode
 \RequirePackage{issuulinks}
 \fi
@@ -84,6 +84,8 @@
   /DestOutputProfile \OBJ@CVR\space 0 R
   /RegistryName(http://www.color.org)
  >> ]}
+\renewcommand\LettrineFontHook{\color{@bgcolor}}
+\setlength\DefaultFindent{2pt}
 \def\faoset#1{\setkeys{fao}{#1}}
 \define@key{fao}{year}{\gdef\fao@year{#1}}
 \faoset{year=20XX}
@@ -654,10 +656,10 @@
 \fi}
 \newif\if@mainmatter
 \def\frontmatter{\cleardoublepage\setbgcolor{gray}\selectcolor
-  \pagenumbering{roman}\pagestyle{standardpagestyle}%
+  \pagestyle{standardpagestyle}%
   \onecolumn\@mainmatterfalse}
 \def\mainmatter{\cleardoublepage\onecolumn
-  \pagenumbering{arabic}\pagestyle{standardpagestyle}%
+  \pagestyle{standardpagestyle}%
   \@mainmattertrue}
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{-1}
@@ -727,34 +729,36 @@
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
       \raggedright\null#2\par}\par\vskip80\p@
   }\par}
+\define@choicekey*+{fao}{symbol}[\val\nr]%
+{righttriangle,square,rightsemicircle}{%
+  \ifcase\nr\relax
+    \gdef\@currentsymbol{(0,0) -- (1ex,0) -- (1ex,1ex) -- cycle}%
+  \or
+   \gdef\@currentsymbol{(0,0) -- (1ex,0) -- (1ex,1ex) -- (0,1ex) --
+     cycle}%
+  \or
+   \gdef\@currentsymbol{(0,0) arc[start angle=90, end angle=-90, x
+     radius = 0.5ex, y radius = 0.5ex] -- cycle}%
+   \fi
+}{\ClassError{faosyb}{Bad symbol value \val}}
+\faoset{symbol=square}
 \def\@spart#1{%
-  \clearspread
+  \clearpage
   \onecolumn
-  \clearspread
   \selectcolor
   \selecticon
-  \color{@bgcolor}%
+  \pagestyle{empty}%
   \rowcolors{2}{@bgcolor!10}{}%
-  \pagestyle{partpagestyle}%
   \phantomsection
   \addcontentsline{toc}{spart}{\hspace{1em}#1}%
-   \def\@partpagepicture{%
-     \put(20,-500){\rotatebox{30}{\parbox{\textwidth}{%
-       \iconfill{1cm}{1.14\textwidth}{20}\\
-       \iconfill{1cm}{1.15\textwidth}{100}\\
-       \iconfill{1cm}{1.14\textwidth}{20}}}}}%
-   \markboth{#1}{#1}%
-   \null
-   \newpage
-   \def\@partpagepicture{\put(150,-150){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
-   \gdef\@partpagepicture{}}
-   {\interlinepenalty \@M
-     \vspace*{80\p@}
-     \captionfamily
-     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
-       \raggedright\null#1\par}\par\vskip80\p@
-   }%
-\par}
+  \makebox[0pt]{%
+       \raisebox{-\totalheight}%
+       [0pt][0pt]{\rotatebox{90}{\Huge
+           \captionfamily
+           \tikz\fill[color=@bgcolor]\@currentsymbol;\space
+           \color{gray}#1\strut}}%
+     \hspace*{50pt}}\par\vspace*{-\baselineskip}%
+ \vspace*{-\parskip}}
 \def\sectionmark#1{\markright{#1}}
 \renewcommand\section{\par\clearspread
   \@startsection {section}{1}{\z@}%
@@ -762,6 +766,11 @@
                                    {2.3ex \@plus.2ex}%
                                    {\normalfont\Large\bfseries\raggedright
                                    \color{@bgcolor}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1sp}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\large\bfseries\raggedright
+                                     \color{@bgcolor}}}
 \newenvironment{tablepages}{\onecolumn
   \bgroup\narrowfamily\multicolsep=\z@
   \vspace*{-2cm}%
@@ -987,7 +996,7 @@
  \renewcommand{\makelabel}[1]{##1\hfil}}}
 {\end{list}}
 \setbgcolor{gray}\selectcolor
-\pagestyle{standardpagestyle}
+\pagestyle{empty}
 \normalsize\normalfont
 \endinput
 %%

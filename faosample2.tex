@@ -22,16 +22,22 @@
 \addtocounter{page}{1}  % To make odd pages even and even pages odd
 
 %\frontmatter
-\mainmatter
+%\mainmatter
 \input{TitlePage.tex}
 
 %\includepdf[pages={1}]{DefaultDisclaimer.pdf}
+
+\faoset{symbol=righttriangle,bgcolor=orange}
 \part*{Foreword}
+\lettrine{T}{his} is a foreword
 \lipsum[1-6]
 
-\part*{Ack\-now\-ledgements}
+\faoset{symbol=square,bgcolor=blue!50!black}
+\part*{Acknowledgements}
+\lettrine{T}{his} is acknowledgements.
 \lipsum[1-5]
 
+\faoset{symbol=rightsemicircle,bgcolor=magenta}
 \part*{How to use this book}
 \input{Howtouse.tex}
 

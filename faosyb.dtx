@@ -257,6 +257,16 @@
 % color in |@bgcolor|, |@tablecolor| colors and \cs{currenticon}
 % macro.  
 %
+% Foreword and other parts in the front matter of the book do not use
+% icons.  Instead they have geometric symbols.  The key |symbol| can
+% have the values |rigthttriangle|, |square|, |rightsemicircle| and
+% sets the symbol for such part.
+%
+% \DescribeMacro{\lettrine}
+% Front matter uses dropped capitals (lettrines) in the beginning of
+% the sections. 
+% The command |\lettrine{W}{ord}| can help in this case. 
+%
 %\subsection{Sectioning}
 %\label{sec:ug_sections}
 %
@@ -741,7 +751,7 @@
 \RequirePackage[authoryear]{natbib}
 \RequirePackage[breaklinks]{hyperref}
 \RequirePackage{bookmark}
-\RequirePackage{adjmulticol}
+\RequirePackage{adjmulticol,lettrine}
 \if@issuumode
 \RequirePackage{issuulinks}
 \fi
@@ -792,6 +802,22 @@
  >> ]}
 %    \end{macrocode}
 %
+% \begin{macro}{\LettrineFontHook}
+% \changes{v1.3}{2013/12/16}{Redefined}
+%   We want the drop caps to have |@bgcolor|
+%    \begin{macrocode}
+\renewcommand\LettrineFontHook{\color{@bgcolor}}
+%    \end{macrocode}
+%   
+% \end{macro}
+% \begin{macro}{\DefaultFindent}
+%   The distance between the dropped capital and the text
+%    \begin{macrocode}
+\setlength\DefaultFindent{2pt}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
 %\subsection{Key-Value Interface}
 % \label{sec:keyval}
 %
@@ -808,7 +834,8 @@
 \define@key{fao}{year}{\gdef\fao@year{#1}}
 \faoset{year=20XX}
 %    \end{macrocode}
-% 
+%
+%  
 %
 %\subsection{Fonts}
 %\label{sec:fonts}
@@ -2042,19 +2069,21 @@
 % \end{macro}
 % 
 % \begin{macro}{\frontmatter}
+% \changes{v1.3}{2013/12/16}{Deleted change in the pagenumbering}
 %   We want Arabic numbers for front matter:
 %    \begin{macrocode}
 \def\frontmatter{\cleardoublepage\setbgcolor{gray}\selectcolor
-  \pagenumbering{roman}\pagestyle{standardpagestyle}%
+  \pagestyle{standardpagestyle}%
   \onecolumn\@mainmatterfalse}
 %    \end{macrocode}
 %   
 % \end{macro}
 % \begin{macro}{\mainmatter}
+% \changes{v1.3}{2013/12/16}{Deleted change in the pagenumbering}
 %   We want Arabic numbers for main matter:
 %    \begin{macrocode}
 \def\mainmatter{\cleardoublepage\onecolumn
-  \pagenumbering{arabic}\pagestyle{standardpagestyle}%
+  \pagestyle{standardpagestyle}%
   \@mainmattertrue}
 %    \end{macrocode}
 %   
@@ -2206,37 +2235,49 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \begin{macro}{\@currentsymbol}
+% \changes{2013/12/16}{Introduced macro}
+% The symbol for the next unnumbered part
+%    \begin{macrocode}
+\define@choicekey*+{fao}{symbol}[\val\nr]%
+{righttriangle,square,rightsemicircle}{%
+  \ifcase\nr\relax
+    \gdef\@currentsymbol{(0,0) -- (1ex,0) -- (1ex,1ex) -- cycle}%
+  \or
+   \gdef\@currentsymbol{(0,0) -- (1ex,0) -- (1ex,1ex) -- (0,1ex) --
+     cycle}%
+  \or
+   \gdef\@currentsymbol{(0,0) arc[start angle=90, end angle=-90, x
+     radius = 0.5ex, y radius = 0.5ex] -- cycle}%
+   \fi
+}{\ClassError{faosyb}{Bad symbol value \val}}
+\faoset{symbol=square}
+%    \end{macrocode}
+% 
+%   
+% \end{macro}
+%
 % \begin{macro}{\@spart}
-%   Unnmumbered parts are only in the forewart
+% \changes{2013/12/16}{Rewrote}
+%   Unnmumbered parts are only in the foreword
 %    \begin{macrocode}
 \def\@spart#1{%
-  \clearspread
+  \clearpage
   \onecolumn  
-  \clearspread
   \selectcolor
   \selecticon
-  \color{@bgcolor}%
+  \pagestyle{empty}%
   \rowcolors{2}{@bgcolor!10}{}%
-  \pagestyle{partpagestyle}%
   \phantomsection
   \addcontentsline{toc}{spart}{\hspace{1em}#1}%
-   \def\@partpagepicture{%
-     \put(20,-500){\rotatebox{30}{\parbox{\textwidth}{%
-       \iconfill{1cm}{1.14\textwidth}{20}\\
-       \iconfill{1cm}{1.15\textwidth}{100}\\
-       \iconfill{1cm}{1.14\textwidth}{20}}}}}%
-   \markboth{#1}{#1}%
-   \null
-   \newpage
-   \def\@partpagepicture{\put(150,-150){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
-   \gdef\@partpagepicture{}}
-   {\interlinepenalty \@M
-     \vspace*{80\p@}
-     \captionfamily
-     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
-       \raggedright\null#1\par}\par\vskip80\p@
-   }%
-\par}
+  \makebox[0pt]{%
+       \raisebox{-\totalheight}%
+       [0pt][0pt]{\rotatebox{90}{\Huge
+           \captionfamily
+           \tikz\fill[color=@bgcolor]\@currentsymbol;\space
+           \color{gray}#1\strut}}%
+     \hspace*{50pt}}\par\vspace*{-\baselineskip}%
+ \vspace*{-\parskip}}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2261,6 +2302,19 @@
                                    {2.3ex \@plus.2ex}%
                                    {\normalfont\Large\bfseries\raggedright
                                    \color{@bgcolor}}}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+% \begin{macro}{\subsection}
+% \changes{v1.3}{2013/12/16}{Redefined}
+%   The subsection macro
+%    \begin{macrocode}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1sp}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\large\bfseries\raggedright
+                                     \color{@bgcolor}}}
 %    \end{macrocode}
 %   
 % \end{macro}
@@ -2852,7 +2906,7 @@
 %
 %    \begin{macrocode}
 \setbgcolor{gray}\selectcolor
-\pagestyle{standardpagestyle}
+\pagestyle{empty}
 \normalsize\normalfont
 %</class>      
 %    \end{macrocode}
