@@ -1,7 +1,12 @@
 \documentclass[print,Draft]{faosyb}
+%\documentclass[web]{faosyb}
+
 \usepackage{lipsum}
 \faoset{year=2013}
 \usepackage{pdfpages}
+\usepackage{graphicx}
+
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
 
 
 %% Define new commands
@@ -27,11 +32,16 @@
 %% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % To make odd pages even and even pages odd
-\addtocounter{page}{1}  
+\addtocounter{page}{-1}  
 
 \frontmatter
 
+\newpage
 \thispagestyle{empty}
+\mbox{}
+
+%\thispagestyle{empty}
+\pagestyle{empty}
 \input{TitlePage.tex}
 
 %% Disclaimer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
