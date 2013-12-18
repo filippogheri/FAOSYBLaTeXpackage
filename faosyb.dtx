@@ -1297,7 +1297,7 @@
 %   Vertical separation between the floats
 %    \begin{macrocode}
 \newlength\nf@vert@sep
-\setlength\nf@vert@sep{20mm}
+\setlength\nf@vert@sep{10mm}
 %    \end{macrocode}
 % \end{macro}
 %   
@@ -1532,7 +1532,13 @@
   \fi
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
-    -2\nf@margin-\nf@trianglebase-2\baselineskip)%
+    -2\nf@margin-\nf@trianglebase)%
+  \ifx\nf@size\tempB
+    \advance\chartheight by -2\baselineskip
+  \fi
+  \ifx\nf@size\tempT
+    \advance\chartheight by -2\baselineskip
+  \fi
   \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
   \nf@height=\dimexpr(\nf@height+\nf@topskip+\nf@bottomskip)%
 %    \end{macrocode}

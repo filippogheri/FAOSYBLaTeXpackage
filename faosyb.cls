@@ -276,7 +276,7 @@
 \def\fao@partblobbottom#1#2{\expandafter\gdef\csname fao@blobend#1\endcsname{#2}}
 \gdef\@toc@ext@list{toc}
 \newlength\nf@vert@sep
-\setlength\nf@vert@sep{20mm}
+\setlength\nf@vert@sep{10mm}
 \newlength\nf@width
 \newlength\nf@height
 \newlength\nf@captionheight
@@ -351,7 +351,13 @@
   \fi
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
-    -2\nf@margin-\nf@trianglebase-2\baselineskip)%
+    -2\nf@margin-\nf@trianglebase)%
+  \ifx\nf@size\tempB
+    \advance\chartheight by -2\baselineskip
+  \fi
+  \ifx\nf@size\tempT
+    \advance\chartheight by -2\baselineskip
+  \fi
   \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
   \nf@height=\dimexpr(\nf@height+\nf@topskip+\nf@bottomskip)%
   \global\setbox\nf@contentsbox
