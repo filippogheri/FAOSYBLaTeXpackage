@@ -189,6 +189,26 @@
 \evenfootmark{\textbf{FAO} Statistical Yearbook \textbf{\fao@year}}
 \def\oddfootmark#1{\gdef\@oddfootmark{#1}}
 \oddfootmark{\rightmark}
+\fancypagestyle{frontmatterpagestyle}{%
+  \fancyhf{}%
+  \fancyhfoffset[LR]{1.5cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyfoot[RO,LE]{%
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \raisebox{-\height}{\fcolorbox{white}{white}{\thepage}}%
+  \egroup}%
+}
+\fancypagestyle{spartpagestyle}{%
+  \fancyhf{}%
+  \fancyhfoffset[LR]{3cm}%
+  \renewcommand\headrulewidth{\z@}%
+  \fancyfoot[RO,LE]{%
+    \bgroup
+    \setlength\fboxsep{10\p@}%
+    \raisebox{-\height}{\fcolorbox{white}{white}{\thepage}}%
+  \egroup}%
+}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
   \fancyhfoffset[LR]{2.22cm}%
@@ -203,7 +223,7 @@
         \colored@icon[width=1.2cm]{\csname
           @icon@\thepart\endcsname}}\fi
       \hspace*{25\p@}}%
-  \fancyfoot[LE]{
+  \fancyfoot[LE]{%
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
@@ -211,7 +231,7 @@
     \normalsize\dotfill
     \raisebox{-\height}{\@evenfootmark\hspace*{25\p@}}%
   \egroup}%
-  \fancyfoot[LO]{
+  \fancyfoot[LO]{%
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
@@ -235,7 +255,7 @@
     \end{picture}}
   \fancyhfoffset[LR]{2.22cm}%
   \renewcommand\headrulewidth{\z@}%
-  \fancyfoot[LE]{
+  \fancyfoot[LE]{%
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
@@ -243,7 +263,7 @@
     \normalsize\dotfill
     \raisebox{-\height}{\@evenfootmark\hspace{20\p@}}%
   \egroup}%
-  \fancyfoot[LO]{
+  \fancyfoot[LO]{%
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
@@ -673,11 +693,9 @@
 \fi}
 \newif\if@mainmatter
 \def\frontmatter{%
-  \pagestyle{standardpagestyle}%
-  \loadgeometry{frontmatter}%
+  \pagestyle{frontmatterpagestyle}%
   \onecolumn\@mainmatterfalse}
-\def\mainmatter{\cleardoublepage\loadgeometry{standard}\onecolumn
-  \pagestyle{standardpagestyle}%
+\def\mainmatter{\loadgeometry{standard}\onecolumn
   \@mainmattertrue}
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{-1}
@@ -698,7 +716,7 @@
   \@tempdima=#1
   \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
     \colored@icon@fg[width=\@tempdima]{\csname
-      @icon@\the\@tempcnta\endcsname}{#3}}%
+      @icon@\the\@tempcnta\endcsname}{#3}\hspace{0.3\@tempdima}}%
   \advance\@tempcnta by 1\relax
   \ifnum\@tempcnta>\@maxpart\relax\@tempcnta=1\fi
   \ifdim\wd\@tempboxa>#2\else\repeat
@@ -712,7 +730,7 @@
   \@tempdima=1.44\@tempdima
   \setbox\@tempboxa=\hbox{\unhbox\@tempboxa
     \colored@icon@fg[width=\@tempdima]{\csname
-      @icon@\thepart\endcsname}{#3}}%
+      @icon@\thepart\endcsname}{#3}\hspace{0.2\@tempdima}}%
   \ifdim\wd\@tempboxa>#2\else\repeat
   \unhbox\@tempboxa
   \fi}
@@ -731,14 +749,18 @@
   {\string\newicon{\thepart}{\currenticon}
     \string\gdef\string\@maxpart{\thepart}}%
   \def\@partpagepicture{%
-    \put(-20,-500){\rotatebox{30}{\parbox{\textwidth}{%
-      \iconfill{1cm}{0.5\textwidth}{20}\currenticonfill{1cm}{0.4\textwidth}{20}\\
-      \iconfill{1cm}{1.15\textwidth}{100}\\
-      \iconfill{1cm}{1.14\textwidth}{20}}}}}%
+    \put(-15,-500){\rotatebox{30}{%
+      \iconfill{1.2cm}{0.4\textwidth}{20}%
+      \currenticonfill{1.2cm}{0.6\textwidth}{20}}}%
+    \put(40,-550){\rotatebox{30}{%
+      \iconfill{1.2cm}{1.2\textwidth}{100}}}%
+    \put(40,-600){\rotatebox{30}{%
+      \iconfill{1.2cm}{1.2\textwidth}{20}}}%
+}
   \markboth{#1}{#1}%
   \null
   \newpage
-  \def\@partpagepicture{\put(150,-200){\rotatebox{30}{\iconfill{1cm}{12cm}{20}}}%
+  \def\@partpagepicture{\put(160,-180){\rotatebox{30}{\iconfill{1cm}{14cm}{20}}}%
   \gdef\@partpagepicture{}}
   {\interlinepenalty \@M
     \vspace*{80\p@}
@@ -763,10 +785,11 @@
 \faoset{symbol=square}
 \def\@spart#1{%
   \cleardoublepage
+  \loadgeometry{frontmatter}%
+  \pagestyle{spartpagestyle}%
   \onecolumn
   \selectcolor
   \selecticon
-  \pagestyle{empty}%
   \rowcolors{2}{@bgcolor!10}{}%
   \phantomsection
   \addcontentsline{toc}{spart}{\hspace{1em}#1}%
@@ -822,11 +845,13 @@
         \end{tikzpicture}}
     \end{picture}\normalcolor
     \raisebox{-17pt}{\strut}}}
-\def\@generictoc#1#2{\clearpage\loadgeometry{standard}\onecolumn
+\def\@generictoc#1#2{\clearpage\loadgeometry{standard}%
+  \pagestyle{frontmatterpagestyle}\onecolumn
   {\fontsize{48pt}{48pt}\selectfont
     \captionfamily\color{black!40}#1\par}\@mkboth{#1}{#1}\bigskip
   \@starttoc{#2}}
-\renewcommand\tableofcontents{\clearpage\loadgeometry{standard}\onecolumn
+\renewcommand\tableofcontents{\clearpage\loadgeometry{standard}%
+  \pagestyle{frontmatterpagestyle}\onecolumn
   \@mkboth{\contentsname}{\contentsname}%
   \makebox[0pt][l]{\fontsize{24pt}{32pt}\selectfont \bfseries
     \color{black!70}\MakeUppercase{\contentsname}\space}%
@@ -1032,6 +1057,7 @@
  \renewcommand{\makelabel}[1]{##1\hfil}}}
 {\end{list}}
 \setbgcolor{gray}\selectcolor
+\loadgeometry{standard}%
 \pagestyle{empty}
 \normalsize\normalfont
 \endinput
