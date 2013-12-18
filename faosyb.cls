@@ -138,7 +138,7 @@
     \AtBeginShipoutUpperLeftForeground{%
       \color{black}%
       \@tempdima=\Gm@layouthoffset
-      \@tempdimb=\Gm@layoutvoffset
+     \@tempdimb=\Gm@layoutvoffset
       \put(\@tempdima,-\@tempdimb+6\p@){\line(0,1){50}}%
       \put(\@tempdima-6\p@,-\@tempdimb){\line(-1,0){50}}%
       \advance\@tempdima by \Gm@layoutwidth
@@ -980,6 +980,9 @@
 \let\l@chart\l@nonfloat
 \newcommand\metadatasection[1]{\clearspread\twocolumn\normalcolor
   \section{#1}}
+\define@key{fao}{indicatorsquarecolor}{%
+  \colorlet{@indicatorsquarecolor}[cmyk]{#1}}
+\faoset{indicatorsquarecolor=gray}
 \def\metadata#1{\bgroup
       \def\meta@key{@@@@}%
     \def\key##1{\NR@gettitle{##1}\phantomsection\label{##1}%
@@ -990,7 +993,7 @@
       \labelsep\z@\itemindent\z@\parsep0.4ex plus 0.5ex minus
       0.2ex\relax\listparindent\z@\leftmargin\z@\rightmargin\z@
     \partopsep\z@}%
-  \item{\bfseries\textbullet~#1\par\penalty10000}}
+  \item{\bfseries{\color{@indicatorsquarecolor}$\blacksquare$}~#1\par\penalty10000}}
 \def\endmetadata{%
   \expandafter\ifx\csname
      metaback@\meta@key\endcsname\relax
