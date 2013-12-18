@@ -3,6 +3,7 @@
 \faoset{year=2013}
 \usepackage{pdfpages}
 
+
 %% Define new commands
 %\input{./NewCommands.tex}
 
@@ -26,16 +27,18 @@
 %% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % To make odd pages even and even pages odd
-\addtocounter{page}{1}  
+%\addtocounter{page}{1}  
 
-\mainmatter
+\frontmatter
+
+\thispagestyle{empty}
 \input{TitlePage.tex}
 
 %% Disclaimer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \includepdf[pages={1}]{DefaultDisclaimer.pdf}
 
-%% Foreward, Acknowledgements, How to use this book  %%%%%%%%%%
+%% Foreword, Acknowledgements, How to use this book  %%%%%%%%%%
 
 \faoset{symbol=righttriangle,bgcolor=orange}
 \part*{Foreword}
@@ -58,13 +61,14 @@
 \listofmaps
 \listoftables
 
-
+\mainmatter
 %%%%%%%%%%%%%%  PART 1: The Setting %%%%%%%%%%%%%
 
 \faoset{bgcolor=part1,icon=icons/settings}
 \part[The Setting]{The\\ Setting}
 \lipsum
 \EndPartIntro
+
 
 \input{chapter1.tex}
 
@@ -141,7 +145,7 @@
 %\faoset{bgcolor=black}
 
 \part{Metadata}
-
+\EndPartIntro
 \metadatasection{Indicators}
 
 \begin{metadata}{Agricultural population}
@@ -169,6 +173,11 @@ Agricultural population is defined as all persons depending for their livelihood
 \clearpage
 
 %%%% End Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The scale.  This blob is exactly 10cm long and 1cm high
+
+\rule{10cm}{1cm}
+
 
 \end{document}
 

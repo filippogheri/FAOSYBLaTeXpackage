@@ -21,10 +21,11 @@
 \DeclareOption{12pt}{\faoyearbook@size@warning{\CurrentOption}}%
 \newif\ifprint
 \printfalse
-\DeclareOption{web}{\printfalse}
+\DeclareOption{web}{\printfalse
+  \PassOptionsToPackage{paper=a4paper}{geometry}}
 \DeclareOption{print}{\printtrue
-  \PassOptionsToPackage{papersize={230mm,317mm},layout=a4paper,
-    layouthoffset=1cm,layoutvoffset=1cm,twoside}{geometry}}
+  \PassOptionsToPackage{papersize={230mm,317mm},
+    layouthoffset=1cm,layoutvoffset=1cm}{geometry}}
 \newif\ifDraft
 \Draftfalse
 \DeclareOption{Draft}{\Drafttrue}
@@ -37,7 +38,8 @@
 \LoadClass[10pt,twoside,twocolumn]{report}
 \RequirePackage{graphicx,xkeyval}
 \RequirePackage[table,cmyk]{xcolor}
-\RequirePackage{tikz,geometry,dcolumn}
+\RequirePackage{tikz,dcolumn}
+\RequirePackage{geometry}
 \usetikzlibrary{calc}
 \RequirePackage{fancyhdr}
 \RequirePackage{lscape,longtable,siunitx,booktabs}
@@ -119,14 +121,18 @@
                \itemsep \parsep}%
    \belowdisplayskip \abovedisplayskip}
 \urlstyle{sf}
-\geometry{layout=a4paper,
-  left=2cm,right=2cm,bottom=2.8cm,top=1.5cm,
-  columnsep=30pt, twoside}%
-\savegeometry{standard}
 \setlength\parindent\z@
 \setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
-\setlength\footskip{27\p@}
-\setlength\headheight{35\p@}
+\geometry{layout=a4paper,
+    left=5cm,right=3.5cm,bottom=2cm,top=76mm,
+    footskip=9mm, head=30mm, headsep=3mm,
+    columnsep=6mm, twoside}%
+\savegeometry{frontmatter}
+\geometry{layout=a4paper,
+  left=2cm,right=2cm,bottom=2cm,top=2.3cm,
+  footskip=9mm, head=30mm, headsep=3mm,
+  columnsep=6mm, twoside}%
+\savegeometry{standard}
 \AtBeginDocument{\ifprint
   \AtBeginShipout{%
     \AtBeginShipoutUpperLeftForeground{%
@@ -190,10 +196,11 @@
   \fancyhead[LE]{\hspace*{25\p@}\color{@bgcolor}\captionfamily
     \Huge\strut\ifnum\thepart>0\relax
     \thepart\fi\normalsize\dotfill}%
-  \fancyhead[LO]{\hspace*{25\p@}\color{@bgcolor}\normalsize\dotfill\captionfamily
-    \Huge\leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
+  \fancyhead[LO]{\hspace*{25\p@}\color{@bgcolor}\normalsize\dotfill
+    \captionfamily\Huge\strut
+    \leftmark\expandafter\ifx\csname @icon@\thepart\endcsname\relax\else\space
       \raisebox{-0.25\totalheight}{%
-        \colored@icon[width=1.1cm]{\csname
+        \colored@icon[width=1.2cm]{\csname
           @icon@\thepart\endcsname}}\fi
       \hspace*{25\p@}}%
   \fancyfoot[LE]{
@@ -220,7 +227,7 @@
   \fancyhead[L]{%
     \begin{picture}(0,0)
       \@partpagepicture
-      \put(-14,50){%
+      \put(-7,63){%
         \raisebox{-\height}{\begin{tikzpicture}
           \fill[color=@bgcolor,opacity=.1]
           (0,0) rectangle ($(\textwidth,\textheight)+(5cm,5cm)$);
@@ -249,13 +256,13 @@
 \def\fao@partblobbottom#1#2{\expandafter\gdef\csname fao@blobend#1\endcsname{#2}}
 \gdef\@toc@ext@list{toc}
 \newlength\nf@vert@sep
-\setlength\nf@vert@sep{30pt}
+\setlength\nf@vert@sep{20mm}
 \newlength\nf@width
 \newlength\nf@height
 \newlength\nf@captionheight
-\setlength\nf@captionheight{32\p@}
+\setlength\nf@captionheight{11mm}
 \newlength\nf@sourceheight
-\setlength\nf@sourceheight{48\p@}
+\setlength\nf@sourceheight{2\baselineskip}
 \newlength\nf@margin
 \setlength\nf@margin{12\p@}
 \newlength\nf@trianglebase
@@ -324,7 +331,7 @@
   \fi
   \chartheight=
     \dimexpr(\nf@height-\nf@captionheight-\nf@sourceheight
-    -2\nf@margin-\nf@trianglebase)%
+    -2\nf@margin-\nf@trianglebase-2\baselineskip)%
   \chartwidth=\dimexpr(\nf@width-2\nf@margin-0.5\nf@trianglebase)%
   \nf@height=\dimexpr(\nf@height+\nf@topskip+\nf@bottomskip)%
   \global\setbox\nf@contentsbox
@@ -374,12 +381,15 @@
     \vskip\nf@margin
     \hskip\dimexpr(\nf@margin+0.5\nf@trianglebase)%
     \vbox to \nf@sourceheight\bgroup
+    \leftskip-\nf@margin\parskip\z@\parindent\z@
     \ifx\nf@source\@empty\else
-    \noindent\color{@bgcolor}%
+    \vskip0.5\baselineskip
+    \color{@bgcolor}%
+      \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}~\rule{.2em}{.2em}~%
       \rule{.2em}{.2em}\par\normalcolor
-    \noindent Source: \nf@source\par\vfill\fi\egroup
+    Source: \nf@source\par\vfill\fi\egroup
     \vfill\egroup
     \edef\nf@currbox{\expandafter\csname nfbox@\nf@size
       @\nf@placement\endcsname}%
@@ -471,14 +481,21 @@
     first column.  Please move them up}
   \fi
   \ifdim\ht\curr@nfbox@B@ul>0.5\baselineskip
-     \global\setbox\@outputbox\vsplit\curr@nfbox@B@ul to \textheight
+     \setbox\@tempboxa\vsplit\curr@nfbox@B@ul to \textheight
+     \setbox\@outputbox \vbox\bgroup
+     \boxmaxdepth \@maxdepth
+     \box\@tempboxa
+     \vfill
+     \egroup
   \else
      \setbox\@tempboxa\vsplit\curr@nfbox@W@ul to 0.5\textheight
      \setbox\@tempboxb\vsplit\curr@nfbox@W@ll to 0.5\textheight
      \setbox\@outputbox\vbox\bgroup
+        \boxmaxdepth \@maxdepth
         \box\@tempboxa
         \nointerlineskip
         \box\@tempboxb
+        \vfill
      \egroup
   \fi
   \global\vsize\textheight
@@ -655,10 +672,11 @@
   \null\vfill\clearpage\fi
 \fi}
 \newif\if@mainmatter
-\def\frontmatter{\cleardoublepage\setbgcolor{gray}\selectcolor
+\def\frontmatter{%
   \pagestyle{standardpagestyle}%
+  \loadgeometry{frontmatter}%
   \onecolumn\@mainmatterfalse}
-\def\mainmatter{\cleardoublepage\onecolumn
+\def\mainmatter{\cleardoublepage\loadgeometry{standard}\onecolumn
   \pagestyle{standardpagestyle}%
   \@mainmattertrue}
 \setcounter{tocdepth}{1}
@@ -669,7 +687,7 @@
 \def\fao@currentpartnum{0}
 \renewcommand\part{%
   \secdef\@part\@spart}
-\def\EndPartIntro{\clearspread\twocolumn\normalcolor
+\def\EndPartIntro{\end{adjmulticols}\clearspread\twocolumn\normalcolor
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
 \def\iconfill#1#2#3{%
@@ -728,7 +746,8 @@
     \fontsize{240\p@}{240\p@}\selectfont\raggedright\thepart~%
     \parbox[b]{0.8\textwidth}{\fontsize{64\p@}{72\p@}\selectfont
       \raggedright\null#2\par}\par\vskip80\p@
-  }\par\normalcolor}
+  }\par\normalcolor
+  \begin{adjmulticols}{1}{44mm}{0mm}}
 \define@choicekey*+{fao}{symbol}[\val\nr]%
 {righttriangle,square,rightsemicircle}{%
   \ifcase\nr\relax
@@ -743,7 +762,7 @@
 }{\ClassError{faosyb}{Bad symbol value \val}}
 \faoset{symbol=square}
 \def\@spart#1{%
-  \clearpage
+  \cleardoublepage
   \onecolumn
   \selectcolor
   \selecticon
@@ -753,7 +772,7 @@
   \addcontentsline{toc}{spart}{\hspace{1em}#1}%
   \makebox[0pt]{%
        \raisebox{-\totalheight}%
-       [0pt][0pt]{\rotatebox{90}{\Huge
+       [0pt][0pt]{\rotatebox{90}{\fontsize{9mm}{9mm}\selectfont
            \captionfamily
            \tikz\fill[color=@bgcolor]\@currentsymbol;\space
            \color{gray}#1\strut}}%
@@ -803,11 +822,11 @@
         \end{tikzpicture}}
     \end{picture}\normalcolor
     \raisebox{-17pt}{\strut}}}
-\def\@generictoc#1#2{\clearspread
+\def\@generictoc#1#2{\clearpage\loadgeometry{standard}\onecolumn
   {\fontsize{48pt}{48pt}\selectfont
     \captionfamily\color{black!40}#1\par}\@mkboth{#1}{#1}\bigskip
   \@starttoc{#2}}
-\renewcommand\tableofcontents{\clearspread
+\renewcommand\tableofcontents{\clearpage\loadgeometry{standard}\onecolumn
   \@mkboth{\contentsname}{\contentsname}%
   \makebox[0pt][l]{\fontsize{24pt}{32pt}\selectfont \bfseries
     \color{black!70}\MakeUppercase{\contentsname}\space}%
@@ -899,7 +918,24 @@
   \immediate\write\@auxout{\string\@writefile{loc}{\string\par}}%
   \immediate\write\@auxout{\string\@writefile{lot}{\string\par}}%
   \immediate\write\@auxout{\string\@writefile{lom}{\string\par}}}
-\newcommand*\l@nonfloat{\@dottedtocline{1}{\z@}{2.3em}}
+\def\nf@dottedtocline#1#2#3#4#5{%
+  \ifnum #1>\c@tocdepth \else
+    \vskip \z@ \@plus.2\p@
+    {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
+     \parindent #2\relax\@afterindenttrue
+     \interlinepenalty\@M
+     \leavevmode
+     \@tempdima #3\relax
+     \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+     {#4}\nobreak
+     \leaders\hbox{$\m@th
+        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+        mu$}\hfill
+     \nobreak
+     \hb@xt@\@pnumwidth{\hfil\normalfont\color{@bgcolor}#5}%
+     \par}%
+  \fi}
+\newcommand*\l@nonfloat{\nf@dottedtocline{1}{\z@}{2.3em}}
 \def\numberline#1{%
   \raisebox{\z@}[\z@][\z@]{%
     \fcolorbox{@bgcolor}{@bgcolor}{%
