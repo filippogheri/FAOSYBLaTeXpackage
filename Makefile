@@ -36,6 +36,7 @@ all:  ${PDF}
 
 faosample2.pdf: part1.tex
 
+faosample3.pdf:  chapter1.tex
 
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls
 

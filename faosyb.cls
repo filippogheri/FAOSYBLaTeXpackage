@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/17 v1.4 Typesetting FAO Yearbook]
+[2013/12/18 v1.5 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -125,12 +125,12 @@
 \setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
 \geometry{layout=a4paper,
     left=5cm,right=3.5cm,bottom=2cm,top=76mm,
-    footskip=9mm, head=30mm, headsep=3mm,
+    footskip=8mm, head=30mm, headsep=3mm,
     columnsep=6mm, twoside}%
 \savegeometry{frontmatter}
 \geometry{layout=a4paper,
   left=2cm,right=2cm,bottom=2cm,top=2.3cm,
-  footskip=9mm, head=30mm, headsep=3mm,
+  footskip=8mm, head=30mm, headsep=3mm,
   columnsep=6mm, twoside}%
 \savegeometry{standard}
 \AtBeginDocument{\ifprint
@@ -211,7 +211,7 @@
 }
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
-  \fancyhfoffset[LR]{2.22cm}%
+  \fancyhfoffset[LR]{2.12cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyhead[LE]{\hspace*{25\p@}\color{@bgcolor}\captionfamily
     \Huge\strut\ifnum\thepart>0\relax
@@ -225,7 +225,7 @@
       \hspace*{25\p@}}%
   \fancyfoot[LE]{%
     \bgroup
-    \setlength\fboxsep{10\p@}%
+    \setlength\fboxsep{11\p@}%
     \color{@bgcolor}%
     \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
     \normalsize\dotfill
@@ -233,7 +233,7 @@
   \egroup}%
   \fancyfoot[LO]{%
     \bgroup
-    \setlength\fboxsep{10\p@}%
+    \setlength\fboxsep{11\p@}%
     \color{@bgcolor}%
     \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
@@ -711,7 +711,8 @@
 \def\fao@currentpartnum{0}
 \renewcommand\part{%
   \secdef\@part\@spart}
-\def\EndPartIntro{\end{adjmulticols}\clearspread\twocolumn\normalcolor
+\def\EndPartIntro{\clearpage
+\end{adjmulticols}\clearspread\twocolumn\normalcolor
   \pagestyle{standardpagestyle}}
 \def\@maxpart{1}
 \def\iconfill#1#2#3{%
@@ -766,7 +767,7 @@
   \markboth{#1}{#1}%
   \null
   \newpage
-  \def\@partpagepicture{\put(160,-180){\rotatebox{30}{\iconfill{1cm}{14cm}{20}}}%
+  \def\@partpagepicture{\put(160,-180){\rotatebox{30}{\iconfill{1.2cm}{13.5cm}{20}}}%
   \gdef\@partpagepicture{}}
   {\interlinepenalty \@M
     \vspace*{80\p@}
@@ -983,8 +984,8 @@
       \def\meta@key{@@@@}%
     \def\key##1{\NR@gettitle{##1}\phantomsection\label{##1}%
       \gdef\meta@key{##1}}
-    \def\source##1{\emph{Source: }##1. }%
-    \def\owner##1{\emph{Owner: }##1. }%
+    \def\source##1{\textbar\,\emph{Source: }##1. }%
+    \def\owner##1{\textbar\,\emph{Owner: }##1. }%
   \begin{list}{}{\topsep8\p@\labelwidth\z@
       \labelsep\z@\itemindent\z@\parsep0.4ex plus 0.5ex minus
       0.2ex\relax\listparindent\z@\leftmargin\z@\rightmargin\z@
@@ -994,7 +995,7 @@
   \expandafter\ifx\csname
      metaback@\meta@key\endcsname\relax
   \else
-    \emph{Referenced in: }
+    \textbar\,\emph{Referenced in: }
     \csname metaback@\meta@key\endcsname
   \fi
   \end{list}\egroup}
@@ -1020,17 +1021,27 @@
     \expandafter
     \list
       \csname\@itemitem\endcsname
-      {\def\makelabel##1{\color{@bgcolor}{##1}\space}%
-        \itemsep\z@\labelwidth\z@
+      {\def\makelabel##1{{##1}\space}\parskip\z@\topsep\z@
+        \itemsep\z@\labelwidth\z@\parsep\z@\partopsep\z@
         \leftmargin\z@\labelsep\z@}%
   \fi}
 \let\endfitemize =\endlist
 \newenvironment{freading}{%
-  \vfill\section*{Further reading}\par
-  \vspace{-\baselineskip}{\color{@bgcolor}{\rule{\columnwidth}{1.5pt}}}\par
-  \vspace{-\baselineskip}\bgroup
+  \bgroup
+  \fboxsep=5\p@
   \let\itemize=\fitemize
-  \let\enditemize=\endfitemize}{\egroup}
+  \let\enditemize=\endfitemize
+  \setbox\@tempboxa=\hbox\bgroup
+  \begin{minipage}{0.9\columnwidth}\parskip\z@
+  {\color{@bgcolor}\bfseries
+    \makebox[\z@][r]{%
+      \tikz\fill[color=@bgcolor] (0,0) -- (1.5ex,0) -- (1.5ex, 1.5ex) --
+      cycle;\hspace{5\p@}}%
+    Further reading\strut\par}}{\end{minipage}\egroup
+  \par\vspace{12mm}%
+  \hspace{\dimexpr(0.1\columnwidth-10\p@)}%
+  \fcolorbox{@bgcolor!10}{@bgcolor!10}{\box\@tempboxa}%
+  \egroup}
 \newlength{\@publicationskip}
 \define@key{fao}{publicationskip}{\setlength{\@publicationskip}{#1}}
 \faoset{publicationskip=6pt plus 2pt minus 2pt}
@@ -1038,19 +1049,38 @@
 \define@key{fao}{publicationparskip}{\setlength{\@publicationparskip}{#1}}
 \faoset{publicationparskip=6pt plus 6pt minus 4pt}
 \newenvironment{publication}[2][]{%
-  \par{\bfseries#2\par}\begin{minipage}[t]{0.49\columnwidth}%
+  \gdef\@pub@cover{#1}%
+  \par
+  \raisebox{\dimexpr(-\baselineskip-\totalheight)}{%
+  \ifx\@pub@cover\@empty\rule{0.4\columnwidth}{\z@}\else
+    \includegraphics[width=0.4\columnwidth]{\@pub@cover}\fi}
+  \hspace{0.1\columnwidth}%
+  \begin{minipage}[t]{0.49\columnwidth}%
     \setlength\parskip{\@publicationparskip}%
-    \gdef\@pub@cover{#1}%
+    {\bfseries\large\color{@bgcolor}#2\par}
     \long\def\pDescription##1{\par##1\par}%
     \def\pEdition##1##2{\par##1: ##2\par}%
     \def\pCycle##1{\par Publication cycle: ##1\par}%
     \def\pWeb##1{\par \raggedright Webpage: \url{##1}\par}}%
   {\end{minipage}%
-  \ifx\@pub@cover\@empty\else
-  \hspace{0.1\columnwidth}%
-  \raisebox{\dimexpr\baselineskip-\totalheight}{%
-    \includegraphics[width=0.4\columnwidth]{\@pub@cover}}\fi\par
+  \par
   \vspace{\@publicationskip}}
+\define@key{fao}{resourcesicon}{\gdef\@resourcesicon{#1}}
+\faoset{resourcesicon={}}
+\define@key{fao}{resourcesname}{\gdef\@resourcesname{#1}}
+\faoset{resourcesname={Key Resources}}
+\def\KeyResources{\clearpage\phantomsection
+  \ifx\@resourcesicon\@empty\else
+  \def\@partpagepicture{%
+    \put(190,-36){\colored@icon[width=1.2cm]{\@resourcesicon}}%
+    \gdef\@partpagepicture{}}
+  \fi
+  \addcontentsline{toc}{section}{\@resourcesname}%
+  \ifx\@resourcesicon\@empty\else
+  \hspace*{1.3cm}%
+  \fi
+  {\color{@bgcolor}\Large\bfseries\raggedright\@resourcesname\par
+    \vspace{2.3ex \@plus.2ex}}}
 \DeclareRobustCommand*\textsubscript[1]{%
   \@textsubscript{\selectfont#1}}
 \def\@textsubscript#1{%
@@ -1062,6 +1092,24 @@
  \addtolength{\leftmargin}{\labelsep}
  \renewcommand{\makelabel}[1]{##1\hfil}}}
 {\end{list}}
+\renewenvironment{thebibliography}[1]
+     {\section{\bibname}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
 \setbgcolor{gray}\selectcolor
 \loadgeometry{standard}%
 \pagestyle{empty}
