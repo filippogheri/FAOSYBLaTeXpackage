@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/18 v1.5 Typesetting FAO Yearbook]
+[2013/12/19 v1.6 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -54,7 +54,6 @@
 \if@issuumode
 \RequirePackage{issuulinks}
 \fi
-\ifprint
 \hypersetup{breaklinks,colorlinks=false,pdfborder=0 0 0,
   pdfauthor={FAO},
   pdfsubject={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
@@ -63,16 +62,6 @@
   pdfpagelayout=TwoColumnLeft,
   pdfnewwindow=true
 }
-\else
-\hypersetup{breaklinks,colorlinks=false,pdfborder=0 0 0,
-  pdfauthor={FAO},
-  pdfsubject={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
-  pdftitle={Statistical Yearbook of the Food And Agricultural Organization for the United Nations},
-  pdfkeywords={FAO, Food Security, Undernourishment, Sustainable agriculture},
-  pdfpagelayout=TwoColumnRight,
-  pdfnewwindow=true
-}
-\fi
 \def\@pctchar{\expandafter\@gobble\string\%}
 \def\@bchar{\expandafter\@gobble\string\\}
 \immediate\pdfobj stream attr{/N 4}  file{FOGRA39L.icc}
@@ -124,12 +113,12 @@
 \setlength\parindent\z@
 \setlength\parskip{6\p@ plus 6\p@ minus 4\p@}
 \geometry{layout=a4paper,
-    left=5cm,right=3.5cm,bottom=2cm,top=76mm,
+    left=5cm,right=3.5cm,bottom=2.3cm,top=76mm,
     footskip=8mm, head=30mm, headsep=3mm,
     columnsep=6mm, twoside}%
 \savegeometry{frontmatter}
 \geometry{layout=a4paper,
-  left=2cm,right=2cm,bottom=2cm,top=2.3cm,
+  left=2cm,right=2cm,bottom=2.3cm,top=2.3cm,
   footskip=8mm, head=30mm, headsep=3mm,
   columnsep=6mm, twoside}%
 \savegeometry{standard}
@@ -209,6 +198,9 @@
     \raisebox{-\height}{\fcolorbox{white}{white}{\thepage}}%
   \egroup}%
 }
+\def\@foliobox{\bgroup\normalsize\normalfont\fboxsep=5mm\relax
+  \fcolorbox{@bgcolor}{@bgcolor}{\parbox{4mm}{\centering
+      \color{white}\thepage\strut}}\egroup}
 \fancypagestyle{standardpagestyle}{%
   \fancyhf{}%
   \fancyhfoffset[LR]{2.12cm}%
@@ -227,7 +219,7 @@
     \bgroup
     \setlength\fboxsep{11\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \raisebox{-\height}{\@foliobox}%
     \normalsize\dotfill
     \raisebox{-\height}{\@evenfootmark\hspace*{25\p@}}%
   \egroup}%
@@ -237,7 +229,7 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
-    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \raisebox{-\height}{\@foliobox}%
   \egroup}%
 }
 \pagestyle{standardpagestyle}
@@ -259,7 +251,7 @@
     \bgroup
     \setlength\fboxsep{10\p@}%
     \color{@bgcolor}%
-    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \raisebox{-\height}{\@foliobox}%
     \normalsize\dotfill
     \raisebox{-\height}{\@evenfootmark\hspace{20\p@}}%
   \egroup}%
@@ -269,7 +261,7 @@
     \color{@bgcolor}%
     \raisebox{-\height}{\hspace*{25\p@}\@oddfootmark}%
     \normalsize\dotfill
-    \raisebox{-\height}{\fcolorbox{@bgcolor}{@bgcolor}{\color{white}\thepage}}%
+    \raisebox{-\height}{\@foliobox}%
   \egroup}%
 }
 \def\fao@partblobtop#1#2{\expandafter\gdef\csname fao@blobstart#1\endcsname{#2}}
@@ -987,8 +979,8 @@
       \def\meta@key{@@@@}%
     \def\key##1{\NR@gettitle{##1}\phantomsection\label{##1}%
       \gdef\meta@key{##1}}
-    \def\source##1{\textbar\,\emph{Source: }##1. }%
-    \def\owner##1{\textbar\,\emph{Owner: }##1. }%
+    \def\source##1{\textbar\,\emph{\bfseries Source: }##1. }%
+    \def\owner##1{\textbar\,\emph{\bfseries Owner: }##1. }%
   \begin{list}{}{\topsep8\p@\labelwidth\z@
       \labelsep\z@\itemindent\z@\parsep0.4ex plus 0.5ex minus
       0.2ex\relax\listparindent\z@\leftmargin\z@\rightmargin\z@
@@ -998,7 +990,7 @@
   \expandafter\ifx\csname
      metaback@\meta@key\endcsname\relax
   \else
-    \textbar\,\emph{Referenced in: }
+    \textbar\,\emph{\bfseries Referenced in: }
     \csname metaback@\meta@key\endcsname
   \fi
   \end{list}\egroup}
@@ -1054,9 +1046,10 @@
 \newenvironment{publication}[2][]{%
   \gdef\@pub@cover{#1}%
   \par
-  \raisebox{\dimexpr(-\baselineskip-\totalheight)}{%
+  \raisebox{\dimexpr(\baselineskip-\totalheight)}[0pt]{%
   \ifx\@pub@cover\@empty\rule{0.4\columnwidth}{\z@}\else
-    \includegraphics[width=0.4\columnwidth]{\@pub@cover}\fi}
+    \includegraphics[width=0.4\columnwidth, angle=5,
+    origin=c]{\@pub@cover}\fi}
   \hspace{0.1\columnwidth}%
   \begin{minipage}[t]{0.49\columnwidth}%
     \setlength\parskip{\@publicationparskip}%
