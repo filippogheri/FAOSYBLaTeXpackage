@@ -1,0 +1,235 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% LaTeX template for the Statistical Yearbook series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Invocation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\documentclass[print]{faosyb}
+\documentclass[print,Draft]{faosyb}
+%\documentclass[web]{faosyb}
+%\documentclass[web,Draft]{faosyb}
+%\documentclass[issuu]{faosyb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load LaTeX packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{lipsum}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{issuulinks}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Define publication parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{year=2014}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
+%% Icon for the resource section
+\faoset{resourcesicon=icons/settings.png}
+
+%% Define new commands
+%\input{./NewCommands.tex}
+
+%% Colors
+\definecolor{for}{cmyk}{80,0,20,0}
+\definecolor{ack}{cmyk}{80,0,20,0}
+\definecolor{part1}{cmyk}{0.90,0.40,0.24,0.32}
+\definecolor{part2}{cmyk}{0,0.54,0.96,0.10}
+\definecolor{part3}{cmyk}{0.18,0.90,0.75,0.31}
+\definecolor{part4}{cmyk}{0.73,0.10,0.97,0.29}
+\definecolor{part5}{cmyk}{0,0,0,0.5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Begin Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%% To make odd pages even and even pages odd
+\addtocounter{page}{-1}  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Front matter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\frontmatter
+
+%% White page at the beginning
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+%% Title page
+\pagestyle{empty}
+\input{TitlePage.tex}
+
+%% Disclaimer
+\includepdf[pages={1}]{DefaultDisclaimer.pdf}
+
+%% Foreword
+\faoset{symbol = righttriangle, bgcolor = orange}
+\part*{Foreword}
+\lettrine{F}{oreword} \lipsum[1-6]
+
+%% Acknowledgements
+\faoset{symbol = rightsemicircle, bgcolor = cyan}
+\part*{Acknowledgements}
+\lettrine{A}{cknowledgements} \lipsum[1-5]
+
+%% How to use this book
+\faoset{symbol = square, bgcolor = ack}
+\part*{How to use this book}
+\lettrine{H}{ow to use this book} \lipsum[1]
+\input{Howtouse.tex}
+
+%% Table contents
+\tableofcontents
+
+%% List of charts
+\listofcharts
+
+%% List of maps
+\listofmaps
+
+%% List of tables
+\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Main matter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%  PART 1  %%%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=part1,icon=icons/settings}
+\part[The Setting]{The\\ Setting}
+\lipsum
+
+\KeyResources
+\input{KeyResources.tex}
+
+\EndPartIntro
+
+%% Environments chapter 1
+\input{chapter1.tex}
+
+%% Tables chapter 1
+\section{}
+\begin{tablepages}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%%%%%%%%%%  PART 2  %%%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=part2,icon=icons/hunger}
+\part{Hunger Dimensions}
+\lipsum
+
+\KeyResources
+\input{KeyResources.tex}
+
+\EndPartIntro
+
+%% Environments chapter 2
+\input{chapter2.tex}
+
+%% Tables chapter 2
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%%%%%%%%%%  PART 3  %%%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=part3,icon=icons/feeding}
+\part[Feeding the world]{Feeding\\ the world}
+\lipsum
+
+\KeyResources
+\input{KeyResources.tex}
+
+\EndPartIntro
+
+%% Environments chapter 3
+\input{chapter3.tex}
+
+%% Tables chapter 3
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%%%%%%%%%%  PART 4  %%%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=part4,icon=icons/sustainability}
+\part[Sustainability dimensions]{Sustain\-ability dimensions}
+\lipsum
+
+\KeyResources
+\input{KeyResources.tex}
+
+\EndPartIntro
+
+%% Environments chapter 4
+\input{chapter4.tex}
+
+%% Tables chapter 4
+\begin{tablepages}
+\section{}
+\small
+\input{T_P1.CAP.1}  
+\clearpage
+\input{T_P2.HE.1}
+\end{tablepages}
+
+%%%%%%%%%%%%%%%%%%%%%%  METADATA  %%%%%%%%%%%%%%%%%%%%%%
+
+\faoset{bgcolor=gray}
+%\faoset{bgcolor=black}
+
+\part{Metadata}
+\EndPartIntro
+\metadatasection{Metadata}
+
+\begin{metadata}{Agricultural population}
+\key{agripop}
+Agricultural population is defined as all persons depending for their livelihood on agriculture, hunting, fishing and forestry. It comprises all persons economically active in agriculture as well as their non-working dependents. It is not necessary that this referred population exclusively come from rural population.
+\source{\href{http://www.fao.org/economic/ess/en/}{Statistics
+    Division} (\href{http://faostat.fao.org}{FAOSTAT})} 
+\owner{\href{http://www.fao.org}{FAO}} 
+\end{metadata}
+
+\begin{metadata}{Foo}
+  \lipsum[1-12]
+\end{metadata}
+
+%%%%%%%%%%%%%%%%%%%%%  BIBLIOGRAPHY  %%%%%%%%%%%%%%%%%%%%%
+
+\onecolumn
+\input{nocite.tex}
+\bibliographystyle{faobibstyle}
+\bibliography{SYB2013refs}
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The scale.  This blob is exactly 10cm long and 1cm high
+\rule{10cm}{1cm}
+
+\end{document}
