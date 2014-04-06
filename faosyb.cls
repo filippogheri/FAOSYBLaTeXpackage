@@ -10,7 +10,7 @@
 %% All rights reserved.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{faosyb}
-[2013/12/19 v1.6 Typesetting FAO Yearbook]
+[2014/04/06 v1.7 Typesetting FAO Yearbook]
 \long\def\faoyearbook@size@warning#1{%
   \ClassWarning{faoyearbook}{Size-changing option #1 will not be
     honored}}%
@@ -180,12 +180,12 @@
 \oddfootmark{\rightmark}
 \fancypagestyle{frontmatterpagestyle}{%
   \fancyhf{}%
-  \fancyhfoffset[LR]{1.5cm}%
+  \fancyhfoffset[LR]{2cm}%
   \renewcommand\headrulewidth{\z@}%
   \fancyfoot[RO,LE]{%
     \bgroup
     \setlength\fboxsep{10\p@}%
-    \raisebox{-\height}{\fcolorbox{white}{white}{\thepage}}%
+    \raisebox{\dimexpr(-\height-.5cm)}{\fcolorbox{white}{white}{\thepage}}%
   \egroup}%
 }
 \fancypagestyle{spartpagestyle}{%
@@ -1047,8 +1047,8 @@
   \gdef\@pub@cover{#1}%
   \par
   \raisebox{\dimexpr(\baselineskip-\totalheight)}[0pt]{%
-  \ifx\@pub@cover\@empty\rule{0.4\columnwidth}{\z@}\else
-    \includegraphics[width=0.4\columnwidth, angle=5,
+  \ifx\@pub@cover\@empty\rule{0.35\columnwidth}{\z@}\else
+    \includegraphics[width=0.35\columnwidth, angle=5,
     origin=c]{\@pub@cover}\fi}
   \hspace{0.1\columnwidth}%
   \begin{minipage}[t]{0.49\columnwidth}%
